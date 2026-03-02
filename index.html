@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DATZON</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- Global Blur Overlay (Single reusable layer for modal/loader) -->
+<div id="global-overlay" class="overlay hidden"></div>
+
+<!-- Global Loader (Uses overlay) -->
+<div id="global-loader" class="loader-container hidden">
+    <div class="spinner"></div>
+    <div id="loader-text">Loading</div>
+</div>
+
+<!-- Sidebar Menu -->
+<div id="sidebar" class="sidebar hidden">
+    <button id="sidebar-close" class="close-btn">×</button>
+    <ul>
+        <li data-page="home">Home</li>
+        <li data-page="apps">Aplikasi</li>
+        <li data-page="store">Store</li>
+        <li data-page="profiles">Profiles</li>
+        <li id="feedback-link">Feedback</li>
+        <li id="about-link">About Me</li>
+    </ul>
+</div>
+
+<!-- Header -->
+<header>
+    <button id="hamburger" aria-label="Menu">☰</button>
+    <h1 id="title">DATZON</h1>
+    <div class="header-right">
+        <button id="search-btn" aria-label="Search">🔍</button>
+        <button id="theme-btn" aria-label="Toggle Theme">
+            <svg id="sun-icon" class="theme-icon active" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg id="moon-icon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<!-- Search Input (Hidden by default) -->
+<div id="search-container" class="search-container hidden">
+    <input id="search-input" type="text" placeholder="Search...">
+    <button id="search-close">×</button>
+</div>
+
+<!-- Main Content -->
+<main id="main-content">
+    <!-- Pages will be rendered here dynamically -->
+</main>
+
+<!-- Bottom Nav -->
+<nav id="bottom-nav">
+    <button data-page="home" class="nav-btn active">Home</button>
+    <button data-page="store" class="nav-btn">Store</button>
+    <button data-page="profiles" class="nav-btn">Profiles</button>
+    <div id="nav-indicator" class="nav-indicator"></div>
+</nav>
+
+<!-- Product Modal (Uses global overlay) -->
+<div id="product-modal" class="modal hidden">
+    <button id="modal-close" class="close-btn">×</button>
+    <div class="modal-content">
+        <img id="modal-img" src="" alt="">
+        <h2 id="modal-title"></h2>
+        <div id="modal-prices"></div>
+        <div id="modal-desc"></div>
+        <a id="modal-wa-btn" class="wa-btn" href="#">Order via WhatsApp</a>
+    </div>
+    <div id="scroll-indicator" class="scroll-indicator">SCROL KE BAWAH</div>
+</div>
+
+<!-- Admin Popup Modal (Uses global overlay) -->
+<div id="admin-popup" class="modal hidden">
+    <div class="modal-content">
+        <h2>Admin Login</h2>
+        <input id="admin-username" type="password" placeholder="Username">
+        <input id="admin-password" type="password" placeholder="Password">
+        <button id="admin-submit">Login</button>
+    </div>
+</div>
+
+<script type="module">
+    import './firebase.js';
+    import './app.js';
+    import './render.js';
+</script>
+</body>
+</html>
