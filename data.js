@@ -163,14 +163,14 @@ function renderVirtualList(type) {
 
         let node = pool.get(item.id);
         if(!node) {
-            // Create DOM Node
             node = createCardNode(item, type);
             pool.set(item.id, node);
             frag.appendChild(node);
         }
         
-        // Update Y position purely via transform (hardware accelerated)
-        node.style.transform = `translateY(${i * ITEM_HEIGHT}px)`;
+        // PENTING: Gunakan CSS Variable --y sebagai referensi koordinat GPU. 
+        // Ini memungkinkan keyframe CSS 'cardEntrance' memanipulasi koordinat.
+        node.style.setProperty('--y', `${i * ITEM_HEIGHT}px`);
     }
 
     if(frag.childNodes.length > 0) container.appendChild(frag);
@@ -197,7 +197,7 @@ function renderProfiles() {
         const a = document.createElement('a');
         a.href = item.targetLink || item.link || '#';
         a.target = '_blank';
-        a.className = 'item-card';
+        a.className = 'item-card card-enter'; // Ditambahkan card-enter
         a.innerHTML = `
             <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="item-icon" alt="icon">
             <div class="item-info"><div class="item-title">${item.name || 'Link'}</div></div>
@@ -210,7 +210,7 @@ function renderProfiles() {
 // DOM Node Builder
 function createCardNode(item, type) {
     const el = type === 'apps' ? document.createElement('a') : document.createElement('div');
-    el.className = 'item-card';
+    el.className = 'item-card card-enter'; // Ditambahkan card-enter
     
     const icon = item.imageUrl || 'https://via.placeholder.com/50';
     const title = item.name || item.title || '';
