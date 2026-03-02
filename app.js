@@ -142,6 +142,25 @@ document.getElementById('admin-form').addEventListener('submit', (e) => {
 // --- NAVIGATION (Pages & Capsule) ---
 export let activePageId = 'apps';
 
+export function updateNavIndicator() {
+    const activeBtn = Array.from(navBtns).find(b => b.classList.contains('active'));
+    if (!activeBtn) return;
+    const btnIdx = Array.from(navBtns).indexOf(activeBtn);
+    
+    // Calculate boundaries securely so it never overflows
+    const indicatorWidth = navIndicator.offsetWidth;
+    // 12px represents padding (6px left, 6px right)
+    maxTranslateX = bottomNav.offsetWidth - indicatorWidth - 12;
+    
+    let targetX = 0;
+    if (btnIdx === 1) targetX = maxTranslateX / 2;
+    if (btnIdx === 2) targetX = maxTranslateX;
+    
+    baseTranslateX = targetX;
+    navIndicator.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s, background 0.2s';
+    navIndicator.style.setProperty('--tx', `${targetX}px`);
+}
+
 function switchPage(targetId) {
     if(activePageId === targetId) return;
     activePageId = targetId;
@@ -156,13 +175,7 @@ function switchPage(targetId) {
     if(searchWrapper.classList.contains('active')) searchClear.click(); // Close search neatly
     checkActiveOverlays();
     
-    // Update Indicator Position via CSS Variable
-    const btnIdx = Array.from(navBtns).findIndex(b => b.dataset.target === targetId);
-    if(btnIdx !== -1) {
-        const w = bottomNav.offsetWidth / 3;
-        navIndicator.style.setProperty('--tx', `${btnIdx * w}px`);
-    }
-
+    updateNavIndicator();
     window.dispatchEvent(new CustomEvent('pageChanged', { detail: targetId }));
 }
 
@@ -172,39 +185,65 @@ sideLinks.forEach(link => link.addEventListener('click', (e) => {
     switchPage(link.dataset.target);
 }));
 
-// Bottom Nav Drag Logic
-let isDragging = false, startX = 0, currentIdx = 0;
+// Bottom Nav Drag Logic (Fully rewritten for perfect clamping like feedback.html)
+let isDragging = false, startX = 0;
+let baseTranslateX = 0;
+let maxTranslateX = 0;
 
-navIndicator.addEventListener('touchstart', (e) => {
+function startNavDrag(e) {
     isDragging = true;
-    navIndicator.classList.add('dragging'); // Apply lift effect
-    startX = e.touches[0].clientX;
-    currentIdx = Array.from(navBtns).findIndex(b => b.classList.contains('active'));
-}, {passive:true});
-
-document.addEventListener('touchmove', (e) => {
-    if(!isDragging) return;
-    const deltaX = e.touches[0].clientX - startX;
-    const w = bottomNav.offsetWidth / 3;
-    let newTx = (currentIdx * w) + deltaX;
+    navIndicator.classList.add('dragging');
+    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     
-    // Clamp indicator strictly inside nav
-    if(newTx < 0) newTx = 0;
-    if(newTx > w * 2) newTx = w * 2;
+    // Recalculate max to ensure safety during resize
+    maxTranslateX = bottomNav.offsetWidth - navIndicator.offsetWidth - 12; 
+    navIndicator.style.setProperty('--scale', '1.05');
+}
+
+function moveNavDrag(e) {
+    if (!isDragging) return;
+    e.preventDefault(); // Stop scrolling while sliding indicator
+    const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const deltaX = currentX - startX;
+    
+    let newTx = baseTranslateX + deltaX;
+    
+    // STRICT CLAMPING BOUNDARIES
+    if (newTx < 0) newTx = 0;
+    if (newTx > maxTranslateX) newTx = maxTranslateX;
     
     navIndicator.style.setProperty('--tx', `${newTx}px`);
-}, {passive:false});
+}
 
-document.addEventListener('touchend', (e) => {
-    if(!isDragging) return;
+function endNavDrag(e) {
+    if (!isDragging) return;
     isDragging = false;
-    navIndicator.classList.remove('dragging'); // Remove lift effect
+    navIndicator.classList.remove('dragging');
+    navIndicator.style.setProperty('--scale', '1');
     
-    const w = bottomNav.offsetWidth / 3;
     const currentTx = parseFloat(navIndicator.style.getPropertyValue('--tx') || 0);
-    const closestIdx = Math.round(currentTx / w);
+    
+    let closestIdx = 0;
+    if (currentTx > maxTranslateX * 0.75) closestIdx = 2;
+    else if (currentTx > maxTranslateX * 0.25) closestIdx = 1;
+    else closestIdx = 0;
     
     switchPage(navBtns[closestIdx].dataset.target);
+}
+
+// Attach Touch Events
+navIndicator.addEventListener('touchstart', startNavDrag, {passive: false});
+window.addEventListener('touchmove', moveNavDrag, {passive: false});
+window.addEventListener('touchend', endNavDrag);
+
+// Attach Mouse Events (Desktop Dragging matching feedback.html)
+navIndicator.addEventListener('mousedown', startNavDrag);
+window.addEventListener('mousemove', moveNavDrag, {passive: false});
+window.addEventListener('mouseup', endNavDrag);
+
+// Adjust indicator on resize
+window.addEventListener('resize', () => {
+    if (!isDragging) updateNavIndicator();
 });
 
 // Modal Scroll Indicator Logic
@@ -227,4 +266,5 @@ export function resetProductModalScroll() {
 }
 
 // Init startup
+setTimeout(updateNavIndicator, 100); // Wait for CSS load to position correctly
 initLoaderAnimation();
