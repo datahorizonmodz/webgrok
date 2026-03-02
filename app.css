@@ -194,7 +194,7 @@ main { padding: 80px 16px 100px 16px; }
 
 .empty-state { text-align: center; padding: 40px; color: var(--text-muted); display: none; }
 
-/* Bottom Nav */
+/* Bottom Nav - UPDATED STYLES FOR FLOATING DOCK PRECISION */
 .bottom-nav-wrapper {
     position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; padding: 0 16px; z-index: 99;
@@ -204,19 +204,21 @@ main { padding: 80px 16px 100px 16px; }
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-radius: 32px; border: 1px solid var(--border);
     position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 0 6px; /* Inner padding 6px */
+    touch-action: none; /* Prevent scroll when sliding indicator */
 }
 .nav-indicator {
-    position: absolute; top: 10px; left: 0;
-    height: 44px; width: calc(33.33% - 8px); margin-left: 4px; /* clamp strictly inside */
+    position: absolute; top: 10px; bottom: 10px; left: 6px; /* Matches padding exactly */
+    width: calc(33.333% - 4px); /* (Total width / 3) - 4px logic ensuring no overflow */
+    margin: 0;
     background: var(--nav-indicator); border-radius: 22px; z-index: 0;
-    /* Gunakan CSS Variables agar transform tidak bentrok */
     transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s, background 0.2s;
 }
 .nav-indicator.dragging {
     --scale: 1.05; /* Lift effect */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transition: transform 0s, box-shadow 0.2s; /* Hapus delay saat ditarik */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(255,255,255,0.2);
+    transition: none; /* Instant follow during drag */
 }
 .nav-btn {
     flex: 1; background: none; border: none; color: var(--text-muted);
