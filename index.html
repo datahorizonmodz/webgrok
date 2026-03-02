@@ -13,8 +13,10 @@
 
     <!-- GLOBAL LOADER -->
     <div id="loader" class="modal-layer active">
-        <div class="spinner"></div>
-        <div class="loader-text" id="loader-text">Loading</div>
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-text" id="loader-text">Loading</div>
+        </div>
     </div>
 
     <!-- SIDEBAR -->
@@ -76,6 +78,7 @@
 
     <!-- MAIN APP WRAPPER -->
     <div class="app-container">
+
         <!-- HEADER -->
         <header id="header">
             <div class="header-left">
@@ -84,21 +87,29 @@
                 </button>
                 <h1 id="header-title" class="header-title">DATZON</h1>
             </div>
-            
-            <div class="header-search" id="header-search">
-                <input type="text" id="search-input" placeholder="Search...">
-            </div>
 
             <div class="header-right">
-                <button id="search-toggle" class="icon-btn">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
+                <!-- Search Expanding Wrapper -->
+                <div class="search-wrapper" id="search-wrapper">
+                    <button id="search-toggle" class="icon-btn search-toggle-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                    <input type="text" id="search-input" class="search-input" placeholder="Search...">
+                    <button id="search-clear" class="icon-btn search-clear">✕</button>
+                </div>
+
                 <button id="theme-btn" class="icon-btn theme-toggle">
-                    <svg id="icon-moon" class="anim-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    <svg id="icon-sun" class="anim-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <!-- Dibungkus span .icon-inner untuk memisahkan animasi rotasi dari animasi switch mode -->
+                    <span class="icon-inner" id="icon-moon">
+                        <svg class="anim-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    </span>
+                    <span class="icon-inner" id="icon-sun">
+                        <svg class="anim-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    </span>
                 </button>
             </div>
         </header>
+
 
         <!-- MAIN PAGES -->
         <main id="main-content">
