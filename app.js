@@ -6,8 +6,9 @@ const overlay = document.getElementById('global-overlay');
 const sidebar = document.getElementById('sidebar');
 const headerTitle = document.getElementById('header-title');
 const searchToggle = document.getElementById('search-toggle');
-const headerSearch = document.getElementById('header-search');
+const searchWrapper = document.getElementById('search-wrapper');
 const searchInput = document.getElementById('search-input');
+const searchClear = document.getElementById('search-clear');
 const themeBtn = document.getElementById('theme-btn');
 const bottomNav = document.getElementById('bottom-nav');
 const navIndicator = document.getElementById('nav-indicator');
@@ -93,25 +94,16 @@ themeBtn.addEventListener('click', () => {
 
 // --- SEARCH ---
 searchToggle.addEventListener('click', () => {
-    const isActive = headerSearch.classList.contains('active');
-    if (isActive) {
-        headerSearch.classList.remove('active');
-        searchInput.value = '';
-        setPageFilter('');
-    } else {
-        headerSearch.classList.add('active');
-        searchInput.focus();
-        
-        // Add dynamic close button to search bar header visually
-        searchToggle.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" style="position:relative; z-index:2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-    }
+    searchWrapper.classList.add('active');
+    headerTitle.classList.add('hide');
+    searchInput.focus();
 });
 
-// Reset search icon when closed manually
-headerSearch.addEventListener('transitionend', (e) => {
-    if(!headerSearch.classList.contains('active') && e.propertyName === 'opacity') {
-        searchToggle.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>';
-    }
+searchClear.addEventListener('click', () => {
+    searchWrapper.classList.remove('active');
+    headerTitle.classList.remove('hide');
+    searchInput.value = '';
+    setPageFilter('');
 });
 
 let searchTimeout;
@@ -154,23 +146,23 @@ function switchPage(targetId) {
     if(activePageId === targetId) return;
     activePageId = targetId;
     
-    // UI Update
     pages.forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + targetId).classList.add('active');
     
     navBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.target === targetId));
     sideLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
     
-    // Close Sidebar & Search if open
     sidebar.classList.remove('active');
-    if(headerSearch.classList.contains('active')) searchToggle.click();
+    if(searchWrapper.classList.contains('active')) searchClear.click(); // Close search neatly
     checkActiveOverlays();
     
-    // Update Indicator Position
+    // Update Indicator Position via CSS Variable
     const btnIdx = Array.from(navBtns).findIndex(b => b.dataset.target === targetId);
-    if(btnIdx !== -1) navIndicator.style.transform = `translateX(${btnIdx * 100}%)`;
+    if(btnIdx !== -1) {
+        const w = bottomNav.offsetWidth / 3;
+        navIndicator.style.setProperty('--tx', `${btnIdx * w}px`);
+    }
 
-    // Notify data module to render lazy
     window.dispatchEvent(new CustomEvent('pageChanged', { detail: targetId }));
 }
 
@@ -182,11 +174,12 @@ sideLinks.forEach(link => link.addEventListener('click', (e) => {
 
 // Bottom Nav Drag Logic
 let isDragging = false, startX = 0, currentIdx = 0;
+
 navIndicator.addEventListener('touchstart', (e) => {
     isDragging = true;
+    navIndicator.classList.add('dragging'); // Apply lift effect
     startX = e.touches[0].clientX;
     currentIdx = Array.from(navBtns).findIndex(b => b.classList.contains('active'));
-    navIndicator.style.transition = 'none';
 }, {passive:true});
 
 document.addEventListener('touchmove', (e) => {
@@ -195,27 +188,23 @@ document.addEventListener('touchmove', (e) => {
     const w = bottomNav.offsetWidth / 3;
     let newTx = (currentIdx * w) + deltaX;
     
-    // Clamp
+    // Clamp indicator strictly inside nav
     if(newTx < 0) newTx = 0;
     if(newTx > w * 2) newTx = w * 2;
     
-    navIndicator.style.transform = `translateX(${newTx}px)`;
+    navIndicator.style.setProperty('--tx', `${newTx}px`);
 }, {passive:false});
 
 document.addEventListener('touchend', (e) => {
     if(!isDragging) return;
     isDragging = false;
-    navIndicator.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    navIndicator.classList.remove('dragging'); // Remove lift effect
     
     const w = bottomNav.offsetWidth / 3;
-    // Extract matrix tx
-    const style = window.getComputedStyle(navIndicator);
-    const matrix = new WebKitCSSMatrix(style.transform);
-    const finalTx = matrix.m41;
+    const currentTx = parseFloat(navIndicator.style.getPropertyValue('--tx') || 0);
+    const closestIdx = Math.round(currentTx / w);
     
-    const closestIdx = Math.round(finalTx / w);
-    const target = navBtns[closestIdx].dataset.target;
-    switchPage(target);
+    switchPage(navBtns[closestIdx].dataset.target);
 });
 
 // Modal Scroll Indicator Logic
