@@ -27,6 +27,19 @@ const empties = {
 // DOM Node Pools (Map of ID to HTMLElement)
 const domPools = { apps: new Map(), store: new Map() };
 
+// --- FULL RESET FUNCTION (Wipes DOM to Force Animation) ---
+function clearPools() {
+    domPools.apps.forEach(node => node.remove());
+    domPools.store.forEach(node => node.remove());
+    domPools.apps.clear();
+    domPools.store.clear();
+    
+    // Clear HTML completely so NO elements linger, forcing a total UI rebuild
+    lists.apps.innerHTML = '';
+    lists.store.innerHTML = '';
+    lists.profiles.innerHTML = ''; 
+}
+
 // --- INITIALIZATION ---
 let loadedCount = 0;
 function checkAllLoaded() {
@@ -70,6 +83,9 @@ function initFilters() {
             btn.classList.add('active');
             activeCategory = cat.toLowerCase();
             window.scrollTo(0,0);
+            
+            // PENTING: Force Hancurkan Elemen lama agar Render ulang selalu trigger Animasi Mulus
+            clearPools(); 
             renderActiveView();
         });
         filterScroll.appendChild(btn);
@@ -86,6 +102,9 @@ function initFilters() {
 export function setPageFilter(text) {
     queryText = text.toLowerCase();
     window.scrollTo(0,0);
+    
+    // PENTING: Hancurkan pool dan re-trigger animasi saat Search
+    clearPools();
     renderActiveView();
 }
 
@@ -116,8 +135,6 @@ function getProcessedData(type) {
 
 // Central render function
 function renderActiveView() {
-    // Clear unused pools if memory tight, but keeping them caches DOM.
-    // For lazy rendering, we only update the active page.
     if(activePageId === 'apps' || activePageId === 'store') {
         renderVirtualList(activePageId);
     } else if (activePageId === 'profiles') {
@@ -163,13 +180,13 @@ function renderVirtualList(type) {
 
         let node = pool.get(item.id);
         if(!node) {
+            // Jika node tidak ditemukan di pool, maka akan memanggil createCardNode
+            // Ini menjamin node baru akan mendapatkan class 'card-enter' dan ter-animasi!
             node = createCardNode(item, type);
             pool.set(item.id, node);
             frag.appendChild(node);
         }
         
-        // PENTING: Gunakan CSS Variable --y sebagai referensi koordinat GPU. 
-        // Ini memungkinkan keyframe CSS 'cardEntrance' memanipulasi koordinat.
         node.style.setProperty('--y', `${i * ITEM_HEIGHT}px`);
     }
 
@@ -197,7 +214,7 @@ function renderProfiles() {
         const a = document.createElement('a');
         a.href = item.targetLink || item.link || '#';
         a.target = '_blank';
-        a.className = 'item-card card-enter'; // Ditambahkan card-enter
+        a.className = 'item-card card-enter'; 
         a.innerHTML = `
             <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="item-icon" alt="icon">
             <div class="item-info"><div class="item-title">${item.name || 'Link'}</div></div>
@@ -210,7 +227,7 @@ function renderProfiles() {
 // DOM Node Builder
 function createCardNode(item, type) {
     const el = type === 'apps' ? document.createElement('a') : document.createElement('div');
-    el.className = 'item-card card-enter'; // Ditambahkan card-enter
+    el.className = 'item-card card-enter'; // Class Card Animasi akan selalu ditambahkan ke Node Baru
     
     const icon = item.imageUrl || 'https://via.placeholder.com/50';
     const title = item.name || item.title || '';
@@ -266,7 +283,9 @@ window.addEventListener('scroll', () => {
 }, {passive: true});
 
 window.addEventListener('pageChanged', () => {
-    renderActiveView(); // Lazy render active page
+    // PENTING: Force hancurkan node lama dan render ulang tiap kali ganti tab halaman
+    clearPools();
+    renderActiveView(); 
 });
 
 // Boot
