@@ -3,104 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DATZON</title>
+    <title>DATZON Web App</title>
     <link rel="stylesheet" href="app.css">
 </head>
 <body>
 
-<!-- Global Blur Overlay (Single reusable layer for modal/loader) -->
-<div id="global-overlay" class="overlay hidden"></div>
+    <!-- SINGLE GLOBAL OVERLAY (Handles all blurs) -->
+    <div id="global-overlay" class="overlay"></div>
 
-<!-- Global Loader (Uses overlay) -->
-<div id="global-loader" class="loader-container hidden">
-    <div class="spinner"></div>
-    <div id="loader-text">Loading</div>
-</div>
-
-<!-- Sidebar Menu -->
-<div id="sidebar" class="sidebar hidden">
-    <button id="sidebar-close" class="close-btn">×</button>
-    <ul>
-        <li data-page="home">Home</li>
-        <li data-page="apps">Aplikasi</li>
-        <li data-page="store">Store</li>
-        <li data-page="profiles">Profiles</li>
-        <li id="feedback-link">Feedback</li>
-        <li id="about-link">About Me</li>
-    </ul>
-</div>
-
-<!-- Header -->
-<header>
-    <button id="hamburger" aria-label="Menu">☰</button>
-    <h1 id="title">DATZON</h1>
-    <div class="header-right">
-        <button id="search-btn" aria-label="Search">🔍</button>
-        <button id="theme-btn" aria-label="Toggle Theme">
-            <svg id="sun-icon" class="theme-icon active" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <svg id="moon-icon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </button>
+    <!-- GLOBAL LOADER -->
+    <div id="loader" class="modal-layer active">
+        <div class="spinner"></div>
+        <div class="loader-text" id="loader-text">Loading</div>
     </div>
-</header>
 
-<!-- Search Input (Hidden by default) -->
-<div id="search-container" class="search-container hidden">
-    <input id="search-input" type="text" placeholder="Search...">
-    <button id="search-close">×</button>
-</div>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>MENU</h2>
+            <button id="close-sidebar" class="icon-btn">✕</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" data-target="apps" class="side-link active">Home & Aplikasi</a>
+            <a href="#" data-target="store" class="side-link">Store</a>
+            <a href="#" data-target="profiles" class="side-link">Profiles</a>
+            <a href="feedback.html" class="side-link ext">Feedback</a>
+            <a href="about.html" class="side-link ext">About Me</a>
+        </nav>
+    </aside>
 
-<!-- Main Content -->
-<main id="main-content">
-    <!-- Pages will be rendered here dynamically -->
-</main>
-
-<!-- Bottom Nav -->
-<nav id="bottom-nav">
-    <button data-page="home" class="nav-btn active">Home</button>
-    <button data-page="store" class="nav-btn">Store</button>
-    <button data-page="profiles" class="nav-btn">Profiles</button>
-    <div id="nav-indicator" class="nav-indicator"></div>
-</nav>
-
-<!-- Product Modal (Uses global overlay) -->
-<div id="product-modal" class="modal hidden">
-    <button id="modal-close" class="close-btn">×</button>
-    <div class="modal-content">
-        <img id="modal-img" src="" alt="">
-        <h2 id="modal-title"></h2>
-        <div id="modal-prices"></div>
-        <div id="modal-desc"></div>
-        <a id="modal-wa-btn" class="wa-btn" href="#">Order via WhatsApp</a>
+    <!-- ADMIN MODAL -->
+    <div id="admin-modal" class="modal-layer">
+        <div class="modal-box">
+            <button class="close-modal" data-close="admin-modal">✕</button>
+            <h2 class="modal-title" style="text-align:center; margin-bottom: 5px;">DATZON <span style="color:var(--accent);">ADMIN</span></h2>
+            <p style="text-align:center; color:var(--text-muted); font-size: 0.85rem; margin-bottom:20px;">Restricted Access</p>
+            <form id="admin-form">
+                <input type="text" id="admin-user" class="input-field" placeholder="Username" autocomplete="off" required>
+                <input type="password" id="admin-pass" class="input-field" placeholder="Password" autocomplete="off" required>
+                <button type="submit" class="btn-primary">MASUK</button>
+            </form>
+        </div>
     </div>
-    <div id="scroll-indicator" class="scroll-indicator">SCROL KE BAWAH</div>
-</div>
 
-<!-- Admin Popup Modal (Uses global overlay) -->
-<div id="admin-popup" class="modal hidden">
-    <div class="modal-content">
-        <h2>Admin Login</h2>
-        <input id="admin-username" type="password" placeholder="Username">
-        <input id="admin-password" type="password" placeholder="Password">
-        <button id="admin-submit">Login</button>
+    <!-- PRODUCT MODAL -->
+    <div id="product-modal" class="modal-layer">
+        <div class="modal-box product-modal-box">
+            <button class="close-modal" data-close="product-modal">✕</button>
+            <div class="product-header">
+                <img id="pm-img" src="" alt="Product">
+                <h2 id="pm-title" class="modal-title"></h2>
+            </div>
+            
+            <div class="pm-scroll-wrapper">
+                <div class="pm-scroll-area" id="pm-scroll-area">
+                    <div class="pm-section-title">LIST HARGA</div>
+                    <div id="pm-prices" class="pm-text"></div>
+                    
+                    <div class="pm-section-title" style="margin-top: 16px;">DESKRIPSI PRODUK</div>
+                    <div id="pm-desc" class="pm-text"></div>
+                </div>
+                <!-- Scroll Indicator inside Modal -->
+                <div id="pm-indicator" class="pm-indicator">SCROL KE BAWAH</div>
+            </div>
+
+            <a href="#" id="pm-wa-btn" class="btn-wa" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                Order via WhatsApp
+            </a>
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import './firebase.js';
-    import './app.js';
-    import './render.js';
-</script>
+    <!-- MAIN APP WRAPPER -->
+    <div class="app-container">
+        <!-- HEADER -->
+        <header id="header">
+            <div class="header-left">
+                <button id="hamburger" class="icon-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <h1 id="header-title" class="header-title">DATZON</h1>
+            </div>
+            
+            <div class="header-search" id="header-search">
+                <input type="text" id="search-input" placeholder="Search...">
+            </div>
+
+            <div class="header-right">
+                <button id="search-toggle" class="icon-btn">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+                <button id="theme-btn" class="icon-btn theme-toggle">
+                    <svg id="icon-moon" class="anim-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="icon-sun" class="anim-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN PAGES -->
+        <main id="main-content">
+            <!-- PAGE: APPS -->
+            <section id="page-apps" class="page active">
+                <div class="msg-card">
+                    Kumpulan Aplikasi MOD yang bisa kalian download secara gratis. Terkadang ada beberapa aplikasi yang mungkin error karena belum update atau bermasalah. Gua bukan MODER ya, gua cuma mencari MOD yang berguna untuk di-share ke orang yang membutuhkan aplikasinya. Thanks all.
+                </div>
+                
+                <div class="filter-wrapper">
+                    <button class="filter-arrow" id="filter-prev">❮</button>
+                    <div class="filter-scroll" id="filter-scroll">
+                        <!-- Filled via JS -->
+                    </div>
+                    <button class="filter-arrow" id="filter-next">❯</button>
+                </div>
+
+                <!-- Virtualized Container -->
+                <div id="apps-list" class="virtual-list"></div>
+                <div id="apps-empty" class="empty-state">No applications found.</div>
+            </section>
+
+            <!-- PAGE: STORE -->
+            <section id="page-store" class="page">
+                <div class="msg-card">
+                    Datzon Store nyediain produk premium original, tutorial premium, dan layanan suntik sosial media. Bukan akun bajakan, bukan janji palsu, dan bukan toko hit and run. Sudah dipakai banyak orang, trusted, prosesnya jelas, dan harganya masih ramah dompet.
+                </div>
+                
+                <!-- Virtualized Container -->
+                <div id="store-list" class="virtual-list"></div>
+                <div id="store-empty" class="empty-state">No products found.</div>
+            </section>
+
+            <!-- PAGE: PROFILES -->
+            <section id="page-profiles" class="page">
+                <div class="profile-header">
+                    <img src="https://res.cloudinary.com/dwctfnwdu/image/upload/v1772169723/azqedepxawsl4pdteld9.png" alt="DATZON" class="profile-avatar">
+                    <h2 class="card-title" style="font-size: 1.4rem; margin-bottom: 4px;">DATA HORIZON</h2>
+                    <p style="color:var(--text-muted); font-size: 0.9rem;">Support terus DATZON dengan cara Follow/Subscribe Sosmed di bawah ya, Terimakasih Semuanya</p>
+                </div>
+                
+                <!-- Standard Container (Not Virtualized) -->
+                <div id="profiles-list" class="standard-list"></div>
+                <div id="profiles-empty" class="empty-state">No profiles found.</div>
+            </section>
+        </main>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav-wrapper">
+            <nav class="bottom-nav" id="bottom-nav">
+                <div id="nav-indicator" class="nav-indicator"></div>
+                
+                <button class="nav-btn active" data-target="apps" aria-label="Home">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </button>
+                <button class="nav-btn" data-target="store" aria-label="Store">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </button>
+                <button class="nav-btn" data-target="profiles" aria-label="Profile">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+    <script type="module" src="data.js"></script>
 </body>
 </html>
