@@ -99,7 +99,6 @@
                 </div>
 
                 <button id="theme-btn" class="icon-btn theme-toggle">
-                    <!-- Dibungkus span .icon-inner untuk memisahkan animasi rotasi dari animasi switch mode -->
                     <span class="icon-inner" id="icon-moon">
                         <svg class="anim-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </span>
@@ -157,22 +156,29 @@
             </section>
         </main>
 
-        <!-- BOTTOM NAV -->
-        <div class="bottom-nav-wrapper">
-            <nav class="bottom-nav" id="bottom-nav">
-                <div id="nav-indicator" class="nav-indicator"></div>
-                
-                <button class="nav-btn active" data-target="apps" aria-label="Home">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                </button>
-                <button class="nav-btn" data-target="store" aria-label="Store">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                </button>
-                <button class="nav-btn" data-target="profiles" aria-label="Profile">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </button>
-            </nav>
+        <!-- FLOATING BOTTOM DOCK (Liquid Glass iOS 26) -->
+        <div id="mainDock" class="bottom-dock">
+            <div id="dockIndicator" class="dock-indicator"></div>
+            
+            <!-- Tab 1: Apps (Home) -->
+            <div class="dock-tab active-tab" data-target="apps" data-index="0">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span class="tab-text">Home</span>
+            </div>
+            
+            <!-- Tab 2: Store -->
+            <div class="dock-tab" data-target="store" data-index="1">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span class="tab-text">Store</span>
+            </div>
+            
+            <!-- Tab 3: Profiles -->
+            <div class="dock-tab" data-target="profiles" data-index="2">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span class="tab-text">Profile</span>
+            </div>
         </div>
+
     </div>
 
     <!-- Scripts -->
