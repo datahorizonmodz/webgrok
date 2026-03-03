@@ -362,9 +362,14 @@ main { padding: 80px 16px 100px 16px; }
 
 /* =========================================================
    DESKTOP MEDIA QUERY (ENHANCED WIDE 2-COLUMN LAYOUT)
-   ========================================================= */
-@media (min-width: 1024px) {
-    /* ROOT RESET: MATIKAN FLEX CENTER DARI MOBILE */
+   =========================================================
+   MANDATORY OVERRIDE FOR ANDROID DESKTOP MODE:
+   Kita menggunakan 980px agar saat pengguna HP menekan "Desktop Site" 
+   di Chrome, layout desktop LANGSUNG aktif di 100% zoom tanpa perlu 
+   di-zoom out menjadi 50% (karena Chrome mengunci lebar di 980px).
+*/
+@media (min-width: 980px) {
+    /* ROOT RESET: MATIKAN FLEX CENTER DARI MOBILE SECARA PAKSA */
     body { 
         display: block !important; 
         background: var(--bg); 
@@ -394,7 +399,7 @@ main { padding: 80px 16px 100px 16px; }
         100% { transform: translate(40px, 40px) scale(1.1); }
     }
 
-    /* MENGHILANGKAN CONSTRAINT MOBILE 480PX */
+    /* MENGHILANGKAN CONSTRAINT MOBILE 480PX SEPENUHNYA */
     .app-container {
         width: calc(100% - 280px) !important;
         max-width: none !important;
@@ -479,14 +484,15 @@ main { padding: 80px 16px 100px 16px; }
         padding: 120px 48px 140px 48px !important; /* Bottom padding dilebarkan untuk dock */
     }
     
-    /* TETAPKAN BOTTOM DOCK PADA DESKTOP (JANGAN DI-HIDE) */
+    /* TETAPKAN BOTTOM DOCK PADA DESKTOP DAN POSISIKAN DI TENGAH KONTEN */
     .bottom-dock {
         display: flex !important;
-        width: 420px !important; /* Ukuran pas dan nyaman untuk desktop */
-        /* Memposisikan dock persis di tengah MAIN AREA (mengabaikan 280px dari sidebar kiri) */
+        width: 420px !important; 
+        /* Center matematis: 280px sidebar + sisa viewport dibagi 2 */
         left: calc(280px + ((100vw - 280px) / 2)) !important; 
         bottom: 32px !important;
         padding: 6px !important;
+        transform: translateX(-50%) !important;
     }
     
     /* ITEM CARDS - HOVER STATE MENGGUNAKAN POSISI KOORDINAT VIRTUAL (var(--x)) */
