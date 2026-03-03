@@ -195,6 +195,16 @@ main { padding: 80px 16px 100px 16px; }
 }
 .standard-list .item-card { position: relative; height: auto; margin-bottom: 0; transform: none; }
 
+/* =========================================================
+   KODE BARU: SHAPE KHUSUS UNTUK PROFILE CARD
+   ========================================================= */
+.profile-card {
+    border-radius: 999px !important; /* Membuat sudut membulat penuh seperti pil */
+}
+.profile-card .item-icon {
+    border-radius: 50% !important; /* Membuat gambar logo bulat sempurna */
+}
+
 /* Animasi Entrance adaptif membaca X dan Y secara bersamaan */
 .card-enter {
     animation: cardEntrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -363,11 +373,6 @@ main { padding: 80px 16px 100px 16px; }
 /* =========================================================
    DESKTOP MEDIA QUERY (ENHANCED WIDE 2-COLUMN LAYOUT)
    =========================================================
-   BREAKPOINT DITURUNKAN SECARA DRASTIS KE 700PX:
-   Ini adalah "Peluru Perak" untuk masalah zoom HP. Berapapun
-   DPI / Display Size bawaan HP Anda yang menskala ukuran layar, 
-   begitu Anda centang "Mode Desktop", Chrome akan melaporkan ukuran 
-   yang PASTI di atas 700px. Hasilnya: Mode Desktop LANGSUNG aktif di 100%.
 */
 @media (min-width: 700px) {
     /* ROOT RESET: MATIKAN FLEX CENTER DARI MOBILE SECARA PAKSA */
