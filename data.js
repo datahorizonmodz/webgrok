@@ -40,6 +40,17 @@ function clearPools() {
     lists.profiles.innerHTML = ''; 
 }
 
+// --- RESIZE LISTENER FOR VIRTUALIZED GRID RE-RENDER ---
+let currentCols = window.innerWidth >= 1024 ? 2 : 1;
+window.addEventListener('resize', () => {
+    const newCols = window.innerWidth >= 1024 ? 2 : 1;
+    if (newCols !== currentCols) {
+        currentCols = newCols;
+        clearPools();
+        renderActiveView();
+    }
+});
+
 // --- INITIALIZATION ---
 let loadedCount = 0;
 function checkAllLoaded() {
@@ -158,16 +169,23 @@ function renderVirtualList(type) {
     }
     emptyEl.style.display = 'none';
 
-    // Set height to preserve scrollbar
-    container.style.height = `${data.length * ITEM_HEIGHT}px`;
+    // Kalkulasi Kolom Layar
+    const cols = window.innerWidth >= 1024 ? 2 : 1;
+    const rowCount = Math.ceil(data.length / cols);
 
-    // Calculate visible range
+    // Set height to preserve scrollbar based on rows
+    container.style.height = `${rowCount * ITEM_HEIGHT}px`;
+
+    // Calculate visible range (by Row)
     const scrollTop = window.scrollY;
     // Offset by header/margin (~150px approx)
     const viewTop = Math.max(0, scrollTop - 150);
     
-    const startIdx = Math.max(0, Math.floor(viewTop / ITEM_HEIGHT) - BUFFER);
-    const endIdx = Math.min(data.length - 1, Math.ceil((viewTop + window.innerHeight) / ITEM_HEIGHT) + BUFFER);
+    const startRow = Math.max(0, Math.floor(viewTop / ITEM_HEIGHT) - BUFFER);
+    const endRow = Math.min(rowCount - 1, Math.ceil((viewTop + window.innerHeight) / ITEM_HEIGHT) + BUFFER);
+
+    const startIdx = startRow * cols;
+    const endIdx = Math.min(data.length - 1, ((endRow + 1) * cols) - 1);
 
     const activeIds = new Set();
 
@@ -180,14 +198,27 @@ function renderVirtualList(type) {
 
         let node = pool.get(item.id);
         if(!node) {
-            // Jika node tidak ditemukan di pool, maka akan memanggil createCardNode
-            // Ini menjamin node baru akan mendapatkan class 'card-enter' dan ter-animasi!
             node = createCardNode(item, type);
             pool.set(item.id, node);
             frag.appendChild(node);
         }
         
-        node.style.setProperty('--y', `${i * ITEM_HEIGHT}px`);
+        // Posisikan Card berdasarkan Baris (Row) dan Kolom (Col)
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        
+        node.style.setProperty('--y', `${row * ITEM_HEIGHT}px`);
+        
+        if (cols === 2) {
+            // Posisi Kiri atau Kanan dalam Grid
+            // Menggunakan transform 100% lebarnya sendiri + 12px gap
+            node.style.setProperty('--x', col === 0 ? '0px' : 'calc(100% + 12px)');
+            node.style.width = 'calc(50% - 6px)'; 
+        } else {
+            // Lebar Penuh untuk Mobile
+            node.style.setProperty('--x', '0px');
+            node.style.width = '100%';
+        }
     }
 
     if(frag.childNodes.length > 0) container.appendChild(frag);
