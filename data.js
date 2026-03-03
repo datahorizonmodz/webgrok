@@ -245,7 +245,8 @@ function renderProfiles() {
         const a = document.createElement('a');
         a.href = item.targetLink || item.link || '#';
         a.target = '_blank';
-        a.className = 'item-card card-enter'; 
+        // PENAMBAHAN CLASS 'profile-card' KHUSUS DI MENU PROFILE
+        a.className = 'item-card profile-card card-enter'; 
         a.innerHTML = `
             <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="item-icon" alt="icon">
             <div class="item-info"><div class="item-title">${item.name || 'Link'}</div></div>
