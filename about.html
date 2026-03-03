@@ -100,7 +100,7 @@
         }
 
         /* ----------------------------------------------------
-           ANIMASI ENTRANCE PREMIUM (First Load Sequences) 
+           ANIMASI ENTRANCE PREMIUM (Lebih Lambat & Halus) 
            ---------------------------------------------------- */
         .enter-up {
             opacity: 0;
@@ -110,7 +110,8 @@
 
         .page-enter .enter-up {
             visibility: visible;
-            animation: enterUpScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            /* Menggunakan durasi 0.85s dengan easing yang sangat halus */
+            animation: enterUpScale 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         @keyframes enterUpScale {
@@ -124,12 +125,36 @@
             }
         }
 
-        /* Stagger Delays */
+        /* Stagger Delays - Spasi lebih renggang (150ms) */
         .delay-0 { animation-delay: 0ms; }
-        .delay-1 { animation-delay: 120ms; }
-        .delay-2 { animation-delay: 240ms; }
-        .delay-3 { animation-delay: 360ms; }
-        .delay-4 { animation-delay: 480ms; }
+        .delay-1 { animation-delay: 150ms; }
+        .delay-2 { animation-delay: 300ms; }
+        .delay-3 { animation-delay: 450ms; }
+        .delay-4 { animation-delay: 600ms; }
+
+        /* ----------------------------------------------------
+           TYPEWRITER CARET (Kursor Kedip)
+           ---------------------------------------------------- */
+        .typewriter-caret {
+            display: inline-block;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 2px;
+            animation: blinkCaret 0.9s step-end infinite;
+        }
+        
+        .typewriter-caret.finished {
+            animation: fadeOutCaret 0.8s ease forwards;
+            animation-delay: 2s; /* Tunggu 2 detik setelah ngetik selesai sebelum memudar */
+        }
+
+        @keyframes blinkCaret { 
+            50% { opacity: 0; } 
+        }
+        
+        @keyframes fadeOutCaret { 
+            to { opacity: 0; visibility: hidden; } 
+        }
 
         /* ----------------------------------------------------
            ANIMASI FLOATING AVATAR
@@ -149,6 +174,7 @@
             .enter-up { opacity: 1; visibility: visible; transform: none; animation: none; }
             .avatar-float, .bg-shape { animation: none; transform: none; }
             .glass-button:hover { transform: none; }
+            .typewriter-caret { display: none; }
         }
     </style>
 </head>
@@ -183,13 +209,22 @@
                 <div class="flex items-center gap-4 mb-4 border-b border-white/10 pb-4">
                     <!-- Avatar wrapper with floating animation (inner child handles float, outer is static reference) -->
                     <div class="w-14 h-14 shrink-0">
-                        <div class="w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white/20 avatar-float">
+                        <div class="w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white/20 avatar-float" id="avatarImg">
                             <img src="https://res.cloudinary.com/dwctfnwdu/image/upload/v1772169723/azqedepxawsl4pdteld9.png" alt="Profile" class="w-full h-full object-cover">
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-white/90">Halo, Kawan!</h2>
-                        <p class="text-sm text-white/60">Selamat datang di Datzon</p>
+                        <!-- Struktur Typewriter yang anti-layout shift -->
+                        <h2 class="text-xl font-bold text-white/90 relative flex items-center" aria-label="Halo, Kawan!">
+                            <!-- Placeholder transparan menjaga agar tinggi elemen dan layout tidak goyang saat ngetik -->
+                            <span class="invisible pointer-events-none select-none" aria-hidden="true">Halo, Kawan!</span>
+                            <!-- Kontainer teks absolute untuk ngetik -->
+                            <span class="absolute left-0 top-0 flex h-full items-center" aria-hidden="true">
+                                <span id="typewriter-text"></span>
+                                <span id="typewriter-caret" class="typewriter-caret -mt-[2px]">|</span>
+                            </span>
+                        </h2>
+                        <p class="text-sm text-white/60 mt-0.5">Selamat datang di Datzon</p>
                     </div>
                 </div>
                 
@@ -251,11 +286,55 @@
         </footer>
     </div>
 
-    <!-- Script to trigger entrance animation on load -->
+    <!-- Script to trigger entrance animation and typewriter effect -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Trigger cascade entrance animation
             document.body.classList.add("page-enter");
+
+            // Typewriter Configuration & Logic
+            const targetText = "Halo, Kawan!";
+            const textEl = document.getElementById("typewriter-text");
+            const caretEl = document.getElementById("typewriter-caret");
+            const typingSpeed = 50; // 50ms per character
+            const startDelay = 300; // 300ms delay for cinematic feel
+            
+            // Prefers reduced motion check
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+            if (prefersReducedMotion) {
+                // If user prefers reduced motion, disable typewriter and show instantly
+                textEl.textContent = targetText;
+                caretEl.style.display = "none";
+                
+                // Disable floating avatar
+                const avatar = document.getElementById("avatarImg");
+                if (avatar) {
+                    avatar.style.animation = "none";
+                    avatar.style.transform = "none";
+                }
+            } else {
+                // Start elegant typewriter effect
+                let index = 0;
+                
+                setTimeout(() => {
+                    const typeNextChar = () => {
+                        if (index < targetText.length) {
+                            textEl.textContent += targetText.charAt(index);
+                            index++;
+                            setTimeout(typeNextChar, typingSpeed);
+                        } else {
+                            // Typing finished, add class to trigger fade out after delay
+                            caretEl.classList.add("finished");
+                        }
+                    };
+                    
+                    typeNextChar();
+                }, startDelay);
+            }
         });
     </script>
 </body>
 </html>
+
+
