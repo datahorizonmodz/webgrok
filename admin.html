@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATZON | Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 1. Import Font Quicksand */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+        
+        body {
+            /* 2. Terapkan Quicksand secara global dengan default Reguler (400) */
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 400; 
+            background-color: #0f1115; /* Datzon dark vibe */
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* 3. Aturan Typography untuk Admin: Judul = Semibold (600) */
+        h1, h2, h3, h4, h5, h6, 
+        .font-bold, .font-semibold {
+            font-weight: 600 !important; 
+        }
+
+        /* Memastikan teks label, paragraf, dan input tetap Reguler (400) atau mewarisi body */
+        p, span, label, input, textarea, select {
+            font-weight: 400;
+        }
+        
+        /* Pengecualian untuk text pada button agar tetap proporsional dan jelas */
+        button, .nav-btn, a {
+            font-weight: 600 !important;
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.4s ease-out forwards; }
+        .scale-in { animation: scaleIn 0.3s ease-out forwards; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1d24; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+        /* Custom Inputs */
+        input[type="text"], input[type="password"], input[type="number"], select, textarea {
+            background-color: #1a1d24;
+            border: 1px solid #374151;
+            color: white;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Custom Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #22c55e; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #22c55e; }
+        .toggle-checkbox:not(:checked) + .toggle-label { background-color: #ef4444; }
+        .toggle-label { transition: background-color 0.3s ease; }
+        .toggle-dot { transition: transform 0.3s ease; }
+        .toggle-checkbox:checked ~ .toggle-dot { transform: translateX(100%); }
+        
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600 !important;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .status-waiting { background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.4); color: #fde047; }
+        .status-progress { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; }
+        .status-resolved { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); color: #86efac; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+
+    <!-- ========================================== -->
+    <!-- LOGIN POPUP MODAL                          -->
+    <!-- ========================================== -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div id="loginBox" class="bg-[#15181e] border border-gray-800 p-8 rounded-2xl shadow-2xl w-[90%] max-w-md scale-in">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold tracking-wider text-white">DATZON <span class="text-blue-500">ADMIN</span></h1>
+                <p class="text-gray-400 text-sm mt-2">Restricted Access</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Username</label>
+                    <div class="relative">
+                        <input type="password" id="loginUsername" class="w-full pl-4 pr-12 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 bg-[#1a1d24] text-white" placeholder="Enter username" autocomplete="off">
+                        <button type="button" onclick="togglePassword('loginUsername', 'eyeIconUser')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition">
+                            <i id="eyeIconUser" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" class="w-full pl-4 pr-12 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 bg-[#1a1d24] text-white" placeholder="Enter password" autocomplete="off">
+                        <button type="button" onclick="togglePassword('loginPassword', 'eyeIconPass')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition">
+                            <i id="eyeIconPass" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-500/30">
+                    MASUK
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MAIN ADMIN PANEL                           -->
+    <!-- ========================================== -->
+    <div id="adminPanel" class="w-full max-w-7xl p-4 md:p-8 hidden">
+        
+        <!-- Header & Navigation -->
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6">
+            <h1 class="text-3xl font-bold tracking-widest text-white">DATZON<span class="text-blue-500">.</span></h1>
+            
+            <nav class="flex flex-wrap justify-center bg-[#1a1d24] rounded-xl p-1 shadow-lg border border-gray-800">
+                <button onclick="switchTab('apps')" id="tab-apps" class="nav-btn px-4 md:px-6 py-2.5 rounded-lg text-sm transition-all bg-blue-600 text-white">APPS</button>
+                <button onclick="switchTab('products')" id="tab-products" class="nav-btn px-4 md:px-6 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all">PRODUCTS</button>
+                <button onclick="switchTab('profiles')" id="tab-profiles" class="nav-btn px-4 md:px-6 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all">PROFILES</button>
+                <button onclick="switchTab('feedback')" id="tab-feedback" class="nav-btn px-4 md:px-6 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white transition-all relative">
+                    FEEDBACK
+                </button>
+            </nav>
+
+            <!-- Container Action Buttons (Logout & Home) -->
+            <div class="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-3">
+                <button onclick="logout()" class="text-gray-400 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                <a href="index.html" class="text-gray-400 hover:text-blue-500 transition-colors flex items-center gap-2 text-sm font-semibold">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </header>
+
+        <!-- Loader overlay for data fetching -->
+        <div id="globalLoader" class="hidden fixed inset-0 z-40 bg-black/50 flex items-center justify-center backdrop-blur-sm">
+            <div class="loader"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- APPS SECTION                               -->
+        <!-- ========================================== -->
+        <section id="section-apps" class="section-content fade-in hidden">
+            <!-- Isi Section Apps Sama seperti sebelumnya -->
+            <div class="bg-[#15181e] border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-xl font-bold text-gray-100"><i class="fas fa-mobile-alt text-blue-500 mr-2"></i> Manage Apps</h2>
+                    <select id="appSelector" onchange="loadAppForm()" class="px-4 py-2 rounded-lg text-sm cursor-pointer w-full md:w-64 border border-gray-700">
+                        <option value="NEW">-- CREATE NEW APP --</option>
+                    </select>
+                </div>
+                <form id="formApps" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <input type="hidden" id="app_id">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Title</label>
+                            <input type="text" id="app_title" class="w-full px-4 py-2.5 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Target Link</label>
+                            <input type="text" id="app_targetLink" class="w-full px-4 py-2.5 rounded-lg" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Update Date</label>
+                                <input type="text" id="app_updateDate" placeholder="e.g. 20 Feb 2026" class="w-full px-4 py-2.5 rounded-lg" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">Version</label>
+                                <input type="text" id="app_version" placeholder="e.g. 2.3.6" class="w-full px-4 py-2.5 rounded-lg" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Category (Multiple)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 bg-[#1a1d24] p-4 rounded-lg border border-gray-800">
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Popular" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Popular</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Editing" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Editing</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Enhancer" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Enhancer</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Music" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Music</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Film" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Film</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Anime" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Anime</span></label>
+                                <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" value="Random" class="app-category rounded bg-gray-700 border-gray-600 text-blue-500"> <span>Random</span></label>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between bg-[#1a1d24] p-4 rounded-lg border border-gray-800">
+                            <span class="text-sm text-gray-300">Status (Is Active)</span>
+                            <label class="flex items-center cursor-pointer relative">
+                                <input type="checkbox" id="app_isActive" class="sr-only toggle-checkbox" checked>
+                                <div class="toggle-label block w-14 h-8 rounded-full"></div>
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full"></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="bg-[#1a1d24] p-5 rounded-lg border border-gray-800 text-center">
+                            <label class="block text-sm text-gray-400 mb-3 text-left">App Image</label>
+                            <div class="w-full aspect-square max-h-48 mb-4 bg-[#0f1115] rounded-lg border border-dashed border-gray-600 flex items-center justify-center overflow-hidden group relative">
+                                <img id="app_imagePreview" src="https://via.placeholder.com/300?text=No+Image" class="w-full h-full object-contain object-center">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+                                        <i class="fas fa-upload mr-2"></i> Upload New
+                                        <input type="file" id="app_imageFile" class="hidden" accept="image/*" onchange="uploadToCloudinary(this, 'app')">
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="app_uploadProgress" class="text-xs text-blue-400 mb-3 h-4"></div>
+                            <input type="text" id="app_imageUrl" class="w-full px-4 py-2.5 rounded-lg text-xs" placeholder="Image URL will appear here" required>
+                        </div>
+                        <div class="pt-6 flex flex-col gap-3 border-t border-gray-800 mt-auto">
+                            <button type="button" onclick="saveData('apps')" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg transition flex justify-center items-center gap-2">
+                                <i class="fas fa-save"></i> SAVE APP
+                            </button>
+                            <button type="button" id="app_btnDelete" onclick="deleteData('apps')" class="w-full bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white py-3 rounded-lg transition hidden flex justify-center items-center gap-2 border border-red-900/50">
+                                <i class="fas fa-trash-alt"></i> DELETE THIS CONTENT
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PRODUCTS SECTION                           -->
+        <!-- ========================================== -->
+        <section id="section-products" class="section-content hidden">
+            <!-- Isi Section Products Sama seperti sebelumnya -->
+            <div class="bg-[#15181e] border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-xl font-bold text-gray-100"><i class="fas fa-box-open text-blue-500 mr-2"></i> Manage Products</h2>
+                    <select id="productSelector" onchange="loadProductForm()" class="px-4 py-2 rounded-lg text-sm cursor-pointer w-full md:w-64 border border-gray-700">
+                        <option value="NEW">-- CREATE NEW PRODUCT --</option>
+                    </select>
+                </div>
+                <form id="formProducts" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <input type="hidden" id="product_id">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Product Name</label>
+                            <input type="text" id="product_name" class="w-full px-4 py-2.5 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Description</label>
+                            <textarea id="product_description" rows="3" class="w-full px-4 py-2.5 rounded-lg resize-none" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">WhatsApp Link</label>
+                            <input type="text" id="product_whatsappLink" class="w-full px-4 py-2.5 rounded-lg" placeholder="https://wa.me/..." required>
+                        </div>
+                        <div class="flex items-center justify-between bg-[#1a1d24] p-4 rounded-lg border border-gray-800">
+                            <span class="text-sm text-gray-300">Status (Is Active)</span>
+                            <label class="flex items-center cursor-pointer relative">
+                                <input type="checkbox" id="product_isActive" class="sr-only toggle-checkbox" checked>
+                                <div class="toggle-label block w-14 h-8 rounded-full"></div>
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full"></div>
+                            </label>
+                        </div>
+                        <div class="bg-[#1a1d24] p-4 rounded-lg border border-gray-800">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="block text-sm text-gray-400">Price Variants</label>
+                                <button type="button" onclick="addProductPriceField()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded transition"><i class="fas fa-plus mr-1"></i> Add</button>
+                            </div>
+                            <div id="product_pricesContainer" class="space-y-2"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="bg-[#1a1d24] p-5 rounded-lg border border-gray-800 text-center">
+                            <label class="block text-sm text-gray-400 mb-3 text-left">Product Image</label>
+                            <div class="w-full aspect-square max-h-64 mb-4 bg-[#0f1115] rounded-lg border border-dashed border-gray-600 flex items-center justify-center overflow-hidden group relative">
+                                <img id="product_imagePreview" src="https://via.placeholder.com/300?text=No+Image" class="w-full h-full object-contain object-center">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+                                        <i class="fas fa-upload mr-2"></i> Upload New
+                                        <input type="file" id="product_imageFile" class="hidden" accept="image/*" onchange="uploadToCloudinary(this, 'product')">
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="product_uploadProgress" class="text-xs text-blue-400 mb-3 h-4"></div>
+                            <input type="text" id="product_imageUrl" class="w-full px-4 py-2.5 rounded-lg text-xs" placeholder="Image URL will appear here" required>
+                        </div>
+                        <div class="pt-6 flex flex-col gap-3 border-t border-gray-800 mt-auto">
+                            <button type="button" onclick="saveData('products')" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg transition flex justify-center items-center gap-2">
+                                <i class="fas fa-save"></i> SAVE PRODUCT
+                            </button>
+                            <button type="button" id="product_btnDelete" onclick="deleteData('products')" class="w-full bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white py-3 rounded-lg transition hidden flex justify-center items-center gap-2 border border-red-900/50">
+                                <i class="fas fa-trash-alt"></i> DELETE THIS CONTENT
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- PROFILES SECTION                           -->
+        <!-- ========================================== -->
+        <section id="section-profiles" class="section-content hidden">
+            <!-- Isi Section Profiles Sama seperti sebelumnya -->
+            <div class="bg-[#15181e] border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-xl font-bold text-gray-100"><i class="fas fa-user-circle text-blue-500 mr-2"></i> Manage Profiles</h2>
+                    <select id="profileSelector" onchange="loadProfileForm()" class="px-4 py-2 rounded-lg text-sm cursor-pointer w-full md:w-64 border border-gray-700">
+                        <option value="NEW">-- CREATE NEW PROFILE --</option>
+                    </select>
+                </div>
+                <form id="formProfiles" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <input type="hidden" id="profile_id">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Name</label>
+                            <input type="text" id="profile_name" class="w-full px-4 py-2.5 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Target Link</label>
+                            <input type="text" id="profile_targetLink" class="w-full px-4 py-2.5 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Display Order (Number)</label>
+                            <input type="number" id="profile_order" class="w-full px-4 py-2.5 rounded-lg" placeholder="1" required>
+                        </div>
+                        <div class="flex items-center justify-between bg-[#1a1d24] p-4 rounded-lg border border-gray-800 mt-6">
+                            <span class="text-sm text-gray-300">Status (Is Active)</span>
+                            <label class="flex items-center cursor-pointer relative">
+                                <input type="checkbox" id="profile_isActive" class="sr-only toggle-checkbox" checked>
+                                <div class="toggle-label block w-14 h-8 rounded-full"></div>
+                                <div class="toggle-dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full"></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="bg-[#1a1d24] p-5 rounded-lg border border-gray-800 text-center">
+                            <label class="block text-sm text-gray-400 mb-3 text-left">Profile Image</label>
+                            <div class="w-full aspect-square max-h-48 mb-4 bg-[#0f1115] rounded-full mx-auto border border-dashed border-gray-600 flex items-center justify-center overflow-hidden group relative" style="max-width: 12rem;">
+                                <img id="profile_imagePreview" src="https://via.placeholder.com/300?text=No+Image" class="w-full h-full object-cover object-center">
+                                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs">
+                                        <i class="fas fa-upload"></i> Upload
+                                        <input type="file" id="profile_imageFile" class="hidden" accept="image/*" onchange="uploadToCloudinary(this, 'profile')">
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="profile_uploadProgress" class="text-xs text-blue-400 mb-3 h-4"></div>
+                            <input type="text" id="profile_imageUrl" class="w-full px-4 py-2.5 rounded-lg text-xs" placeholder="Image URL will appear here" required>
+                        </div>
+                        <div class="pt-6 flex flex-col gap-3 border-t border-gray-800 mt-auto">
+                            <button type="button" onclick="saveData('profiles')" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg transition flex justify-center items-center gap-2">
+                                <i class="fas fa-save"></i> SAVE PROFILE
+                            </button>
+                            <button type="button" id="profile_btnDelete" onclick="deleteData('profiles')" class="w-full bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white py-3 rounded-lg transition hidden flex justify-center items-center gap-2 border border-red-900/50">
+                                <i class="fas fa-trash-alt"></i> DELETE THIS CONTENT
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- FEEDBACK SECTION (NEW)                     -->
+        <!-- ========================================== -->
+        <section id="section-feedback" class="section-content hidden">
+            <!-- Statistik Feedback -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-[#15181e] border border-gray-800 rounded-xl p-5 flex flex-col items-center justify-center shadow-lg">
+                    <span class="text-3xl font-bold text-white mb-1" id="statTotal">0</span>
+                    <span class="text-xs font-medium text-gray-500 uppercase tracking-widest">Total</span>
+                </div>
+                <div class="bg-[#15181e] border border-yellow-900/50 rounded-xl p-5 flex flex-col items-center justify-center shadow-lg">
+                    <span class="text-3xl font-bold text-yellow-500 mb-1" id="statWaiting">0</span>
+                    <span class="text-xs font-medium text-yellow-500/70 uppercase tracking-widest">Waiting</span>
+                </div>
+                <div class="bg-[#15181e] border border-blue-900/50 rounded-xl p-5 flex flex-col items-center justify-center shadow-lg">
+                    <span class="text-3xl font-bold text-blue-500 mb-1" id="statProgress">0</span>
+                    <span class="text-xs font-medium text-blue-500/70 uppercase tracking-widest">In Progress</span>
+                </div>
+                <div class="bg-[#15181e] border border-green-900/50 rounded-xl p-5 flex flex-col items-center justify-center shadow-lg">
+                    <span class="text-3xl font-bold text-green-500 mb-1" id="statResolved">0</span>
+                    <span class="text-xs font-medium text-green-500/70 uppercase tracking-widest">Resolved</span>
+                </div>
+            </div>
+
+            <!-- List Feedback -->
+            <div class="bg-[#15181e] border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-100"><i class="fas fa-inbox text-blue-500 mr-2"></i> User Feedback Inbox</h2>
+                    <button onclick="fetchCollectionData('feedback')" class="text-sm text-gray-400 hover:text-white transition"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+                </div>
+                
+                <div id="feedbackContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Boxes injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FEEDBACK POPUP MODAL                       -->
+    <!-- ========================================== -->
+    <div id="feedbackModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div id="feedbackBox" class="bg-[#15181e] border border-gray-800 p-6 md:p-8 rounded-2xl shadow-2xl w-[95%] max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar scale-in relative flex flex-col">
+            
+            <button onclick="closeFeedbackModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 hover:bg-red-500">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 class="text-2xl font-bold text-white mb-4 pr-10" id="fbDetailSubject">Subject Here</h2>
+            
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-user-circle text-gray-400 text-xl"></i>
+                <div>
+                    <p class="text-sm font-semibold text-gray-200" id="fbDetailName">Sender Name</p>
+                    <p class="text-xs text-gray-500" id="fbDetailDate">Date</p>
+                </div>
+                <span id="fbDetailBadge" class="ml-auto status-badge status-waiting">WAITING</span>
+            </div>
+
+            <div class="bg-[#1a1d24] border border-gray-800 rounded-xl p-4 mb-6">
+                <p class="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap" id="fbDetailDesc">Description here...</p>
+            </div>
+
+            <hr class="border-gray-800 mb-6">
+
+            <h3 class="text-sm font-bold text-blue-400 mb-3 uppercase tracking-wider"><i class="fas fa-reply mr-2"></i>Admin Action</h3>
+            
+            <form id="feedbackFormAction" class="space-y-5">
+                <input type="hidden" id="fbActionId">
+                
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Admin Response (optional)</label>
+                    <textarea id="fbActionResponse" rows="3" class="w-full px-4 py-3 rounded-xl resize-none" placeholder="Type your response..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Change Status</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button type="button" onclick="selectFbStatus('Waiting')" id="btnStatWaiting" class="flex-1 py-2.5 rounded-lg border border-yellow-500/30 text-yellow-500 font-semibold text-sm transition hover:bg-yellow-500/10">Waiting</button>
+                        <button type="button" onclick="selectFbStatus('In Progress')" id="btnStatProgress" class="flex-1 py-2.5 rounded-lg border border-blue-500/30 text-blue-500 font-semibold text-sm transition hover:bg-blue-500/10">In Progress</button>
+                        <button type="button" onclick="selectFbStatus('Resolved')" id="btnStatResolved" class="flex-1 py-2.5 rounded-lg border border-green-500/30 text-green-500 font-semibold text-sm transition hover:bg-green-500/10">Resolved</button>
+                    </div>
+                    <!-- Hidden input to store selected status -->
+                    <input type="hidden" id="fbActionStatus" value="Waiting">
+                </div>
+
+                <button type="button" onclick="saveFeedbackResponse()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl transition flex justify-center items-center gap-2 mt-4 font-bold">
+                    <i class="fas fa-paper-plane"></i> SUBMIT RESPONSE & UPDATE
+                </button>
+                
+                <button type="button" onclick="deleteFeedback()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white py-3.5 rounded-xl transition flex justify-center items-center gap-2 border border-red-900/50 mt-2 font-bold">
+                    <i class="fas fa-trash-alt"></i> DELETE PERMANENTLY
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Firebase Configuration & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ==========================================
+        // CONFIGURATIONS
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaCVfxYTP3IvR6Jrh3mM0GBsvYKJRjRe4",
+            authDomain: "datzon-web.firebaseapp.com",
+            projectId: "datzon-web",
+            storageBucket: "datzon-web.firebasestorage.app",
+            messagingSenderId: "310892115798",
+            appId: "1:310892115798:web:a03fb9d2b2137933b948f7"
+        };
+
+        const CLOUDINARY_CLOUD_NAME = "dwctfnwdu"; 
+        const CLOUDINARY_UPLOAD_PRESET = "datzon"; 
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentTab = 'apps';
+        let documentsData = { apps: [], products: [], profiles: [], feedback: [] };
+
+        // ==========================================
+        // SECURITY / AUTH SYSTEM
+        // ==========================================
+        const AUTH_KEY = 'datzon_admin_auth_expiry';
+        
+        function checkAuth() {
+            const expiry = localStorage.getItem(AUTH_KEY);
+            if (expiry && Date.now() < parseInt(expiry)) {
+                showAdminPanel();
+            } else {
+                localStorage.removeItem(AUTH_KEY);
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+
+            if (u === 'izindatzon' && p === 'qwert67') {
+                localStorage.setItem(AUTH_KEY, Date.now() + (60 * 60 * 1000));
+                document.getElementById('loginBox').classList.add('fade-out');
+                setTimeout(() => {
+                    document.getElementById('loginModal').classList.add('hidden');
+                    document.getElementById('loginBox').classList.remove('fade-out');
+                    showAdminPanel();
+                }, 300);
+            } else {
+                const box = document.getElementById('loginBox');
+                box.classList.remove('shake');
+                void box.offsetWidth; 
+                box.classList.add('shake');
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+            }
+        });
+
+        window.togglePassword = function(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        };
+
+        window.logout = function() {
+            localStorage.removeItem(AUTH_KEY);
+            window.location.reload();
+        }
+
+        function showAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('fade-in');
+            switchTab('apps'); // Default tab
+        }
+
+        // ==========================================
+        // UI & NAVIGATION
+        // ==========================================
+        window.switchTab = function(tabName) {
+            currentTab = tabName;
+            
+            // Perbarui tombol menu
+            ['apps', 'products', 'profiles', 'feedback'].forEach(name => {
+                const btn = document.getElementById(`tab-${name}`);
+                if(name === tabName) {
+                    btn.classList.replace('text-gray-400', 'text-white');
+                    btn.classList.add('bg-blue-600');
+                    btn.classList.remove('hover:text-white');
+                } else {
+                    btn.classList.replace('text-white', 'text-gray-400');
+                    btn.classList.remove('bg-blue-600');
+                    btn.classList.add('hover:text-white');
+                }
+                
+                const section = document.getElementById(`section-${name}`);
+                if(name === tabName) {
+                    section.classList.remove('hidden');
+                    section.classList.add('fade-in');
+                } else {
+                    section.classList.add('hidden');
+                    section.classList.remove('fade-in');
+                }
+            });
+
+            fetchCollectionData(tabName);
+        }
+
+        function showLoader(show) {
+            const l = document.getElementById('globalLoader');
+            if(show) l.classList.remove('hidden');
+            else l.classList.add('hidden');
+        }
+
+        // ==========================================
+        // FIRESTORE CRUD LOGIC
+        // ==========================================
+        window.fetchCollectionData = async function(collectionName) {
+            showLoader(true);
+            try {
+                const querySnapshot = await getDocs(collection(db, collectionName));
+                let docs = [];
+                querySnapshot.forEach((doc) => {
+                    docs.push({ id: doc.id, ...doc.data() });
+                });
+                documentsData[collectionName] = docs;
+                
+                if (collectionName === 'feedback') {
+                    renderFeedbackData();
+                } else {
+                    populateSelector(collectionName);
+                    if(collectionName === 'apps') resetAppForm();
+                    if(collectionName === 'products') resetProductForm();
+                    if(collectionName === 'profiles') resetProfileForm();
+                }
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                alert("Failed to load data. Check console.");
+            }
+            showLoader(false);
+        }
+
+        function populateSelector(collectionName) {
+            let selectId = collectionName === 'apps' ? 'appSelector' : 
+                           collectionName === 'products' ? 'productSelector' : 'profileSelector';
+            let select = document.getElementById(selectId);
+            
+            select.innerHTML = `<option value="NEW">-- CREATE NEW ${collectionName.toUpperCase().slice(0,-1)} --</option>`;
+            
+            documentsData[collectionName].forEach(item => {
+                let name = item.title || item.name || 'Untitled';
+                select.innerHTML += `<option value="${item.id}">${name}</option>`;
+            });
+        }
+
+        // ==========================================
+        // FEEDBACK LOGIC (NEW)
+        // ==========================================
+        function renderFeedbackData() {
+            const data = documentsData.feedback;
+            
+            // Hitung Statistik
+            let wait = 0, prog = 0, res = 0;
+            data.forEach(item => {
+                const stat = (item.status || 'waiting').toLowerCase();
+                if(stat === 'waiting') wait++;
+                else if(stat === 'in progress') prog++;
+                else if(stat === 'resolved') res++;
+            });
+            
+            document.getElementById('statTotal').innerText = data.length;
+            document.getElementById('statWaiting').innerText = wait;
+            document.getElementById('statProgress').innerText = prog;
+            document.getElementById('statResolved').innerText = res;
+
+            // Sorting: Waiting -> In Progress -> Resolved -> by Date Newest
+            const statusOrder = { 'waiting': 1, 'in progress': 2, 'resolved': 3 };
+            data.sort((a, b) => {
+                const sA = statusOrder[(a.status || 'waiting').toLowerCase()] || 4;
+                const sB = statusOrder[(b.status || 'waiting').toLowerCase()] || 4;
+                if (sA !== sB) return sA - sB; // Urutkan berdasarkan status
+                
+                // Jika status sama, urutkan berdasarkan waktu (terbaru di atas)
+                const tA = a.timestamp ? a.timestamp.toMillis() : 0;
+                const tB = b.timestamp ? b.timestamp.toMillis() : 0;
+                return tB - tA;
+            });
+
+            // Render ke HTML
+            const container = document.getElementById('feedbackContainer');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">No feedback available.</div>`;
+                return;
+            }
+
+            data.forEach(item => {
+                let dateStr = "Just now";
+                if (item.timestamp) {
+                    dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(item.timestamp.toDate());
+                }
+
+                const statusStr = item.status || 'Waiting';
+                let statusClass = 'status-waiting';
+                if (statusStr.toLowerCase() === 'in progress') statusClass = 'status-progress';
+                if (statusStr.toLowerCase() === 'resolved') statusClass = 'status-resolved';
+
+                const html = `
+                    <div onclick="openFeedbackModal('${item.id}')" class="bg-[#1a1d24] border border-gray-800 p-5 rounded-xl cursor-pointer hover:border-blue-500/50 hover:bg-[#1e222b] transition-all flex flex-col h-full shadow-lg group">
+                        <div class="flex justify-between items-start mb-3 gap-3">
+                            <h3 class="font-bold text-gray-200 text-sm line-clamp-2 group-hover:text-blue-400 transition">${escapeHtml(item.subject)}</h3>
+                            <span class="status-badge ${statusClass} shrink-0 text-[0.65rem]">${statusStr}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3 flex items-center gap-1"><i class="fas fa-user text-[10px]"></i> ${escapeHtml(item.name)}</p>
+                        <p class="text-sm text-gray-500 line-clamp-3 mb-4 flex-1">${escapeHtml(item.description)}</p>
+                        <p class="text-[10px] text-gray-600 border-t border-gray-800 pt-3 mt-auto">${dateStr}</p>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        window.openFeedbackModal = function(id) {
+            const item = documentsData.feedback.find(d => d.id === id);
+            if(!item) return;
+
+            document.getElementById('fbActionId').value = item.id;
+            document.getElementById('fbDetailSubject').innerText = item.subject || 'No Subject';
+            document.getElementById('fbDetailName').innerText = item.name || 'Anonymous';
+            
+            let dateStr = "Just now";
+            if (item.timestamp) dateStr = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(item.timestamp.toDate());
+            document.getElementById('fbDetailDate').innerText = dateStr;
+            
+            document.getElementById('fbDetailDesc').innerText = item.description || '-';
+            
+            // Set View Badge
+            const badge = document.getElementById('fbDetailBadge');
+            badge.innerText = item.status || 'WAITING';
+            const statLower = (item.status || 'waiting').toLowerCase();
+            badge.className = 'ml-auto status-badge ' + 
+                (statLower === 'resolved' ? 'status-resolved' : statLower === 'in progress' ? 'status-progress' : 'status-waiting');
+
+            // Set Admin Form inputs
+            document.getElementById('fbActionResponse').value = item.adminResponse || '';
+            selectFbStatus(item.status || 'Waiting');
+
+            // Tampilkan Modal
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+
+        window.closeFeedbackModal = function() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        }
+
+        window.selectFbStatus = function(status) {
+            document.getElementById('fbActionStatus').value = status;
+            
+            // Reset style tombol
+            const btns = [
+                {id: 'btnStatWaiting', color: 'yellow'}, 
+                {id: 'btnStatProgress', color: 'blue'}, 
+                {id: 'btnStatResolved', color: 'green'}
+            ];
+            
+            btns.forEach(b => {
+                const el = document.getElementById(b.id);
+                el.className = `flex-1 py-2.5 rounded-lg border border-${b.color}-500/30 text-${b.color}-500 font-semibold text-sm transition hover:bg-${b.color}-500/10`;
+            });
+
+            // Aktifkan yang dipilih
+            if(status === 'Waiting') {
+                document.getElementById('btnStatWaiting').className = `flex-1 py-2.5 rounded-lg border border-yellow-500 bg-yellow-500 text-black font-bold text-sm transition`;
+            } else if (status === 'In Progress') {
+                document.getElementById('btnStatProgress').className = `flex-1 py-2.5 rounded-lg border border-blue-500 bg-blue-500 text-white font-bold text-sm transition`;
+            } else if (status === 'Resolved') {
+                document.getElementById('btnStatResolved').className = `flex-1 py-2.5 rounded-lg border border-green-500 bg-green-500 text-black font-bold text-sm transition`;
+            }
+        }
+
+        window.saveFeedbackResponse = async function() {
+            const id = document.getElementById('fbActionId').value;
+            const resp = document.getElementById('fbActionResponse').value;
+            const status = document.getElementById('fbActionStatus').value;
+            
+            if(!id) return;
+
+            showLoader(true);
+            try {
+                // Update Firestore dan sisipkan serverTimestamp otomatis
+                await updateDoc(doc(db, 'feedback', id), {
+                    adminResponse: resp,
+                    status: status,
+                    adminTimestamp: serverTimestamp()
+                });
+                
+                alert('Feedback response updated!');
+                closeFeedbackModal();
+                fetchCollectionData('feedback'); // Refresh data list
+
+            } catch (error) {
+                console.error("Save response error:", error);
+                alert("Failed to update response: " + error.message);
+            }
+            showLoader(false);
+        }
+        
+        // Permanent Delete Feedback Function
+        window.deleteFeedback = async function() {
+            const id = document.getElementById('fbActionId').value;
+            if(!id) return;
+
+            if(!confirm("Are you sure you want to permanently delete this feedback?")) {
+                return;
+            }
+
+            showLoader(true);
+            try {
+                await deleteDoc(doc(db, 'feedback', id));
+                closeFeedbackModal();
+                fetchCollectionData('feedback'); // Refresh list & update statistics
+            } catch (error) {
+                console.error("Delete feedback error:", error);
+                alert("Failed to delete feedback: " + error.message);
+            }
+            showLoader(false);
+        }
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe.toString()
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+
+        // ==========================================
+        // OLD FORM HANDLERS (APPS, PROD, PROFILES)
+        // ==========================================
+        window.loadAppForm = function() { /*...same as before...*/
+            const id = document.getElementById('appSelector').value;
+            if(id === 'NEW') return resetAppForm();
+            const data = documentsData.apps.find(d => d.id === id);
+            if(!data) return;
+            document.getElementById('app_id').value = data.id;
+            document.getElementById('app_title').value = data.title || '';
+            document.getElementById('app_targetLink').value = data.targetLink || '';
+            document.getElementById('app_updateDate').value = data.updateDate || '';
+            document.getElementById('app_version').value = data.version || '';
+            document.getElementById('app_isActive').checked = data.isActive !== false; 
+            document.getElementById('app_imageUrl').value = data.imageUrl || '';
+            document.getElementById('app_imagePreview').src = data.imageUrl || 'https://via.placeholder.com/300?text=No+Image';
+            const checkboxes = document.querySelectorAll('.app-category');
+            checkboxes.forEach(cb => cb.checked = false);
+            if(Array.isArray(data.category)) {
+                checkboxes.forEach(cb => { if(data.category.includes(cb.value)) cb.checked = true; });
+            }
+            document.getElementById('app_btnDelete').classList.remove('hidden');
+        }
+
+        function resetAppForm() {
+            document.getElementById('formApps').reset();
+            document.getElementById('app_id').value = '';
+            document.getElementById('app_imagePreview').src = 'https://via.placeholder.com/300?text=No+Image';
+            document.getElementById('app_uploadProgress').innerText = '';
+            document.getElementById('app_btnDelete').classList.add('hidden');
+        }
+
+        window.loadProductForm = function() { /*...same as before...*/
+            const id = document.getElementById('productSelector').value;
+            if(id === 'NEW') return resetProductForm();
+            const data = documentsData.products.find(d => d.id === id);
+            if(!data) return;
+            document.getElementById('product_id').value = data.id;
+            document.getElementById('product_name').value = data.name || '';
+            document.getElementById('product_description').value = data.description || '';
+            document.getElementById('product_whatsappLink').value = data.whatsappLink || '';
+            document.getElementById('product_isActive').checked = data.isActive !== false;
+            document.getElementById('product_imageUrl').value = data.imageUrl || '';
+            document.getElementById('product_imagePreview').src = data.imageUrl || 'https://via.placeholder.com/300?text=No+Image';
+            document.getElementById('product_pricesContainer').innerHTML = '';
+            if(Array.isArray(data.priceText) && data.priceText.length > 0) {
+                data.priceText.forEach(p => addProductPriceField(p));
+            } else { addProductPriceField(); }
+            document.getElementById('product_btnDelete').classList.remove('hidden');
+        }
+
+        function resetProductForm() {
+            document.getElementById('formProducts').reset();
+            document.getElementById('product_id').value = '';
+            document.getElementById('product_imagePreview').src = 'https://via.placeholder.com/300?text=No+Image';
+            document.getElementById('product_uploadProgress').innerText = '';
+            document.getElementById('product_pricesContainer').innerHTML = '';
+            addProductPriceField(); 
+            document.getElementById('product_btnDelete').classList.add('hidden');
+        }
+
+        window.addProductPriceField = function(value = '') {
+            const container = document.getElementById('product_pricesContainer');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center fade-in';
+            div.innerHTML = `
+                <input type="text" value="${value}" class="price-input flex-1 px-3 py-2 rounded border border-gray-700 bg-gray-800 text-sm" placeholder="e.g. 1 Month - Rp50.000">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 px-3 py-2 bg-red-900/20 rounded border border-red-900/50 transition"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.loadProfileForm = function() { /*...same as before...*/
+            const id = document.getElementById('profileSelector').value;
+            if(id === 'NEW') return resetProfileForm();
+            const data = documentsData.profiles.find(d => d.id === id);
+            if(!data) return;
+            document.getElementById('profile_id').value = data.id;
+            document.getElementById('profile_name').value = data.name || '';
+            document.getElementById('profile_targetLink').value = data.targetLink || '';
+            document.getElementById('profile_order').value = data.order || '';
+            document.getElementById('profile_isActive').checked = data.isActive !== false;
+            document.getElementById('profile_imageUrl').value = data.imageUrl || '';
+            document.getElementById('profile_imagePreview').src = data.imageUrl || 'https://via.placeholder.com/300?text=No+Image';
+            document.getElementById('profile_btnDelete').classList.remove('hidden');
+        }
+
+        function resetProfileForm() {
+            document.getElementById('formProfiles').reset();
+            document.getElementById('profile_id').value = '';
+            document.getElementById('profile_imagePreview').src = 'https://via.placeholder.com/300?text=No+Image';
+            document.getElementById('profile_uploadProgress').innerText = '';
+            document.getElementById('profile_btnDelete').classList.add('hidden');
+        }
+
+        // SAVE & DELETE GLOBAL
+        window.saveData = async function(collectionName) {
+            showLoader(true);
+            try {
+                let id, payload = {};
+                if (collectionName === 'apps') {
+                    id = document.getElementById('app_id').value;
+                    let categories = Array.from(document.querySelectorAll('.app-category:checked')).map(cb => cb.value);
+                    payload = {
+                        title: document.getElementById('app_title').value,
+                        targetLink: document.getElementById('app_targetLink').value,
+                        updateDate: document.getElementById('app_updateDate').value,
+                        version: document.getElementById('app_version').value,
+                        category: categories,
+                        isActive: document.getElementById('app_isActive').checked,
+                        imageUrl: document.getElementById('app_imageUrl').value
+                    };
+                } else if (collectionName === 'products') {
+                    id = document.getElementById('product_id').value;
+                    let prices = Array.from(document.querySelectorAll('.price-input')).map(inp => inp.value).filter(v => v.trim() !== '');
+                    payload = {
+                        name: document.getElementById('product_name').value,
+                        description: document.getElementById('product_description').value,
+                        whatsappLink: document.getElementById('product_whatsappLink').value,
+                        priceText: prices,
+                        isActive: document.getElementById('product_isActive').checked,
+                        imageUrl: document.getElementById('product_imageUrl').value
+                    };
+                } else if (collectionName === 'profiles') {
+                    id = document.getElementById('profile_id').value;
+                    payload = {
+                        name: document.getElementById('profile_name').value,
+                        targetLink: document.getElementById('profile_targetLink').value,
+                        order: Number(document.getElementById('profile_order').value),
+                        isActive: document.getElementById('profile_isActive').checked,
+                        imageUrl: document.getElementById('profile_imageUrl').value
+                    };
+                }
+
+                if (id) await setDoc(doc(db, collectionName, id), payload, { merge: true });
+                else await addDoc(collection(db, collectionName), payload);
+
+                alert("Successfully saved!");
+                fetchCollectionData(collectionName); 
+            } catch (error) {
+                console.error("Save error:", error);
+                alert("Failed to save: " + error.message);
+            }
+            showLoader(false);
+        }
+
+        window.deleteData = async function(collectionName) {
+            let id = document.getElementById(collectionName === 'apps' ? 'app_id' : collectionName === 'products' ? 'product_id' : 'profile_id').value;
+            if(!id) return;
+            if(!confirm("Are you sure you want to permanently delete this item?")) return;
+
+            showLoader(true);
+            try {
+                await deleteDoc(doc(db, collectionName, id));
+                alert("Successfully deleted!");
+                fetchCollectionData(collectionName);
+            } catch (error) {
+                console.error("Delete error:", error);
+                alert("Failed to delete: " + error.message);
+            }
+            showLoader(false);
+        }
+
+        window.uploadToCloudinary = async function(fileInput, prefix) {
+            const file = fileInput.files[0];
+            if(!file) return;
+
+            const progressEl = document.getElementById(`${prefix}_uploadProgress`);
+            const urlEl = document.getElementById(`${prefix}_imageUrl`);
+            const previewEl = document.getElementById(`${prefix}_imagePreview`);
+
+            progressEl.innerText = "Uploading... 0%";
+            progressEl.classList.remove('text-red-400', 'text-green-400');
+            progressEl.classList.add('text-blue-400');
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+            try {
+                progressEl.innerText = "Uploading... please wait";
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if(data.secure_url) {
+                    urlEl.value = data.secure_url;
+                    previewEl.src = data.secure_url;
+                    progressEl.innerText = "Upload Complete!";
+                    progressEl.classList.replace('text-blue-400', 'text-green-400');
+                } else {
+                    throw new Error(data.error?.message || 'Upload failed');
+                }
+            } catch (error) {
+                console.error("Cloudinary error:", error);
+                progressEl.innerText = "Error: " + error.message + " (Check Cloudinary Preset Config)";
+                progressEl.classList.replace('text-blue-400', 'text-red-400');
+            }
+            
+            fileInput.value = '';
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', checkAuth);
+
+    </script>
+</body>
+</html>
+
