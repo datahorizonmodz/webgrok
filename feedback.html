@@ -185,7 +185,7 @@
         }
 
         /* ----------------------------------------------------
-           ANIMASI ENTRANCE PREMIUM (First Load Sequences) 
+           ANIMASI ENTRANCE PREMIUM (Lebih Lambat & Halus) 
            ---------------------------------------------------- */
         .enter-up {
             opacity: 0;
@@ -195,7 +195,8 @@
 
         .page-enter .enter-up {
             visibility: visible;
-            animation: enterUpScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            /* Menggunakan durasi 0.85s dengan easing yang sangat halus */
+            animation: enterUpScale 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         @keyframes enterUpScale {
@@ -209,7 +210,7 @@
             }
         }
 
-        /* Stagger Delays */
+        /* Stagger Delays - Spasi lebih renggang (150ms) */
         .delay-0 { animation-delay: 0ms; }
         .delay-1 { animation-delay: 150ms; }
         .delay-2 { animation-delay: 300ms; }
@@ -568,7 +569,7 @@
                                 <h3 class="font-medium text-white/90 text-lg leading-tight">${escapeHtml(item.subject)}</h3>
                                 <p class="text-xs text-white/50 mt-1">${escapeHtml(item.name)} &bull; ${dateStr}</p>
                             </div>
-                            <span class="status-badge ${statusClass} whitespace-nowrap">${statusStr}</span>
+                            <span class=\"status-badge ${statusClass} whitespace-nowrap\">${statusStr}</span>
                         </div>
                         <p class="text-sm text-white/70 mt-2 leading-relaxed">${escapeHtml(item.description)}</p>
                         ${adminResponseHtml}
@@ -584,3 +585,5 @@
     </script>
 </body>
 </html>
+
+
