@@ -12,8 +12,18 @@
     --border: rgba(0, 0, 0, 0.06);
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     --overlay: rgba(0, 0, 0, 0.4);
-    --nav-indicator: #3b82f6;
-    --nav-icon-active: #ffffff;
+    
+    /* DOCK LIQUID GLASS - LIGHT */
+    --dock-bg: rgba(255, 255, 255, 0.65);
+    --dock-border: rgba(255, 255, 255, 0.8);
+    --dock-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    --dock-ind-bg: rgba(255, 255, 255, 0.9);
+    --dock-ind-border: rgba(0, 0, 0, 0.04);
+    --dock-ind-shadow: 0 4px 15px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 1);
+    --dock-ind-bg-lifted: rgba(255, 255, 255, 1);
+    --dock-ind-shadow-lifted: 0 8px 25px rgba(0, 0, 0, 0.12), 0 0 15px rgba(255, 255, 255, 0.5);
+    --dock-icon-active: var(--text-main);
+    --dock-icon-inactive: var(--text-muted);
 }
 
 [data-theme="dark"] {
@@ -28,8 +38,18 @@
     --border: rgba(255, 255, 255, 0.06);
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     --overlay: rgba(14, 22, 33, 0.7);
-    --nav-indicator: #40a7e3;
-    --nav-icon-active: #ffffff;
+
+    /* DOCK LIQUID GLASS - DARK */
+    --dock-bg: rgba(23, 33, 43, 0.65);
+    --dock-border: rgba(255, 255, 255, 0.1);
+    --dock-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    --dock-ind-bg: rgba(255, 255, 255, 0.12);
+    --dock-ind-border: rgba(255, 255, 255, 0.15);
+    --dock-ind-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    --dock-ind-bg-lifted: rgba(255, 255, 255, 0.18);
+    --dock-ind-shadow-lifted: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 255, 255, 0.1);
+    --dock-icon-active: #ffffff;
+    --dock-icon-inactive: rgba(255, 255, 255, 0.4);
 }
 
 /* Base Reset */
@@ -83,7 +103,7 @@ header {
 
 /* Expanding Search UI */
 .search-wrapper {
-    position: absolute; right: 44px; /* di sebelah tombol theme */
+    position: absolute; right: 44px;
     width: 40px; height: 40px; border-radius: 20px;
     background: transparent; display: flex; align-items: center;
     overflow: hidden; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -169,9 +189,7 @@ main { padding: 80px 16px 100px 16px; }
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 12px; display: flex; align-items: center;
     box-shadow: var(--shadow); text-decoration: none; color: var(--text-main);
-    /* translateY is applied inline by JS */
 }
-/* Standard non-absolute items */
 .standard-list .item-card { position: relative; height: auto; margin-bottom: 0; }
 
 .card-enter {
@@ -194,38 +212,51 @@ main { padding: 80px 16px 100px 16px; }
 
 .empty-state { text-align: center; padding: 40px; color: var(--text-muted); display: none; }
 
-/* Bottom Nav - UPDATED STYLES FOR FLOATING DOCK PRECISION */
-.bottom-nav-wrapper {
-    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px; padding: 0 16px; z-index: 99;
+/* =========================================================
+   FLOATING DOCK (LIQUID GLASS iOS 26) 
+   ========================================================= */
+.bottom-dock {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    width: calc(100% - 32px); max-width: 420px;
+    display: flex; align-items: center; padding: 6px;
+    background: var(--dock-bg);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--dock-border);
+    border-radius: 9999px; z-index: 99;
+    box-shadow: var(--dock-shadow);
+    touch-action: none; user-select: none; cursor: pointer;
 }
-.bottom-nav {
-    display: flex; height: 64px; background: var(--surface-glass);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border-radius: 32px; border: 1px solid var(--border);
-    position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 0 6px; /* Inner padding 6px */
-    touch-action: none; /* Prevent scroll when sliding indicator */
+.dock-indicator {
+    position: absolute; left: 6px; top: 6px; bottom: 6px;
+    width: calc((100% - 12px) / 3);
+    background: var(--dock-ind-bg);
+    border-radius: 9999px; z-index: 0; pointer-events: none;
+    border: 1px solid var(--dock-ind-border);
+    box-shadow: var(--dock-ind-shadow);
+    transform-origin: center;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.2s ease;
 }
-.nav-indicator {
-    position: absolute; top: 10px; bottom: 10px; left: 6px; /* Matches padding exactly */
-    width: calc(33.333% - 4px); /* (Total width / 3) - 4px logic ensuring no overflow */
-    margin: 0;
-    background: var(--nav-indicator); border-radius: 22px; z-index: 0;
-    transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s, background 0.2s;
+.dock-indicator.lifted {
+    background: var(--dock-ind-bg-lifted);
+    box-shadow: var(--dock-ind-shadow-lifted);
+    transition: none !important; /* Instant follow during drag */
 }
-.nav-indicator.dragging {
-    --scale: 1.05; /* Lift effect */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(255,255,255,0.2);
-    transition: none; /* Instant follow during drag */
+.dock-tab {
+    flex: 1; position: relative; z-index: 10; display: flex; align-items: center; justify-content: center;
+    padding: 12px 0; color: var(--dock-icon-inactive);
+    transition: color 0.3s ease;
 }
-.nav-btn {
-    flex: 1; background: none; border: none; color: var(--text-muted);
-    z-index: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: color 0.3s;
+.dock-tab.active-tab {
+    color: var(--dock-icon-active);
 }
-.nav-btn.active { color: var(--nav-icon-active); }
+.tab-text {
+    max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    margin-left: 0; font-size: 0.85rem; font-weight: 600;
+}
+.dock-tab.active-tab .tab-text {
+    max-width: 80px; opacity: 1; margin-left: 6px;
+}
 
 /* Global Overlay & Modals */
 .overlay {
@@ -317,7 +348,7 @@ main { padding: 80px 16px 100px 16px; }
 }
 .loader-text {
     color: var(--text-main); font-weight: 700; font-size: 1.1rem;
-    width: 86px; text-align: left; /* Width di-lock agar tidak geser saat dot tambah */
+    width: 86px; text-align: left;
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -325,7 +356,7 @@ main { padding: 80px 16px 100px 16px; }
 .profile-header { text-align: center; margin-bottom: 24px; }
 .profile-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--accent); margin-bottom: 12px; }
 
-/* --- TAMBAHKAN DESKTOP MEDIA QUERY DI PALING BAWAH --- */
+/* --- DESKTOP MEDIA QUERY --- */
 @media (min-width: 1024px) {
     body { background: var(--bg); }
     .app-container {
@@ -354,13 +385,13 @@ main { padding: 80px 16px 100px 16px; }
         flex: 1; max-width: 800px; margin: 0 auto; padding-top: 100px;
     }
     
-    /* HIDE BOTTOM NAV */
-    .bottom-nav-wrapper { display: none; }
+    /* HIDE BOTTOM DOCK ON DESKTOP */
+    .bottom-dock { display: none; }
     
     /* RESPONSIVE SEARCH */
     .search-wrapper.active { max-width: 400px; }
     
-    /* ITEM CARDS EXPAND HORIZONTALLY (Keep height strictly for virtualization!) */
+    /* ITEM CARDS EXPAND HORIZONTALLY */
     .item-card { width: 100%; transition: transform 0.2s, box-shadow 0.2s; }
     .item-card:hover { transform: translateY(var(--y, 0px)) scale(1.02); box-shadow: var(--shadow); z-index: 2; }
 }
