@@ -1,313 +1,293 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DATZON Feedback</title>
-    <!-- Use main app styles -->
-    <link rel="stylesheet" href="app.css">
-    
+    <title>Feedback - Liquid Glass iOS 26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* =========================================================
-           FEEDBACK SPECIFIC STYLES (Extending app.css)
-           ========================================================= */
-        
-        /* View Stack Controller */
-        .view-container {
-            position: relative;
+        /* Background Dinamis */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #1e3a8a, #4c1d95, #0f172a, #0369a1);
+            background-size: 300% 300%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            overscroll-behavior-y: none;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Bentuk abstrak di belakang kaca */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .shape1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #3b82f6; animation: float 10s infinite alternate; }
+        .shape2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #8b5cf6; animation: float 14s infinite alternate-reverse; }
+        .shape3 { top: 40%; left: 30%; width: 40vw; height: 40vw; background: #06b6d4; animation: float 12s infinite alternate; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Tema Liquid Glass */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .liquid-glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Elemen Input & Tombol */
+        .glass-input {
             width: 100%;
-            min-height: 500px;
-        }
-        .view-panel {
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transform: translateY(15px);
-            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-        }
-        .view-panel.active-view {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-            transform: translateY(0);
-            position: relative;
-        }
-
-        /* History Activity Cards */
-        .history-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 12px 16px;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
         }
-        .history-card:hover {
-            border-color: var(--accent-light);
-        }
-        .history-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-            gap: 12px;
-        }
-        .history-card-title {
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--text-main);
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-        .history-card-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        .history-card-desc {
-            font-size: 0.9rem;
-            color: var(--text-main);
-            line-height: 1.5;
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.25);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
         }
 
-        /* Status Badges */
+        .glass-button {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        .glass-button:active { transform: scale(0.97); }
+
+        /* Badge Status */
         .status-badge {
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 600;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            white-space: nowrap;
         }
-        .status-waiting { background: rgba(234, 179, 8, 0.15); color: #ca8a04; border: 1px solid rgba(234, 179, 8, 0.3); }
-        .status-progress { background: rgba(59, 130, 246, 0.15); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .status-resolved { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
-        [data-theme="dark"] .status-waiting { color: #fef08a; }
-        [data-theme="dark"] .status-progress { color: #bfdbfe; }
-        [data-theme="dark"] .status-resolved { color: #bbf7d0; }
+        .status-waiting { background: rgba(234, 179, 8, 0.2); border: 1px solid rgba(234, 179, 8, 0.5); color: #fef08a; }
+        .status-progress { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); color: #bfdbfe; }
+        .status-resolved { background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); color: #bbf7d0; }
 
-        /* Admin Response Thread */
-        .admin-response {
-            margin-top: 14px;
-            padding-left: 14px;
-            border-left: 3px solid var(--accent);
-            background: var(--surface-glass);
-            padding-top: 10px;
-            padding-bottom: 10px;
-            padding-right: 10px;
-            border-radius: 0 8px 8px 0;
-        }
-        .admin-meta {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .admin-meta::before {
-            content: '';
-            display: block;
-            width: 6px; height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-        .admin-text {
-            font-size: 0.85rem;
-            color: var(--text-main);
-            font-style: italic;
-        }
+        /* Custom Scrollbar */
+        .history-container::-webkit-scrollbar { width: 6px; }
+        .history-container::-webkit-scrollbar-track { background: transparent; }
+        .history-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
 
-        /* Toast Notification */
-        #toast {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            background: #10b981;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
+        /* Layout Stack untuk View (Form vs Activity) */
+        .view-container {
+            display: grid;
+            grid-template-areas: "stack";
+            width: 100%;
         }
-        #toast.show {
+        .view-panel {
+            grid-area: stack;
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+        }
+        .view-panel.active-view {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .view-panel.inactive-view {
+            opacity: 0;
+            transform: translateY(15px);
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Loading & Empty States */
-        .loading-history {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
+        /* Floating Bottom Dock */
+        .bottom-dock {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.4);
+            touch-action: none; 
         }
-        .empty-history {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
+        .dock-indicator {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255,255,255,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .dock-indicator.lifted {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: none;
         }
 
-        /* Custom Desktop Overrides for Standalone Feedback Page */
-        @media (min-width: 700px) {
-            .app-container.feedback-container {
-                margin: 0 auto !important;
-                max-width: 600px !important;
-                width: 100% !important;
-                box-shadow: 0 0 40px rgba(0,0,0,0.05) !important;
-            }
-            header.feedback-header {
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                width: 100% !important;
-                max-width: 600px !important;
-                justify-content: space-between;
-            }
-            .bottom-dock.feedback-dock {
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-            }
+        /* Animasi Teks Dinamis di Dock */
+        .tab-text {
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            margin-left: 0;
+            font-size: 0.875rem; /* setara dengan text-sm */
+            font-weight: 500;
+        }
+        
+        .active-tab .tab-text {
+            max-width: 80px; /* Cukup untuk menampung kata Feedback/Activity */
+            opacity: 1;
+            margin-left: 8px; /* Memberi jarak dengan icon */
         }
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-blue-500/30">
 
-    <!-- Main Container matches main DATZON layout -->
-    <div class="app-container feedback-container">
+    <!-- Dekorasi Background -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6 min-h-screen flex flex-col relative pb-32">
         
         <!-- Header -->
-        <header id="header" class="feedback-header">
-            <div class="header-left">
-                <!-- Back Button instead of Hamburger -->
-                <a href="index.html" class="icon-btn" title="Back to Home">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </a>
-                <h1 class="header-title" style="margin-left: 8px;">FEEDBACK</h1>
-            </div>
-
-            <div class="header-right">
-                <!-- Theme Toggle matching app.js -->
-                <button id="theme-btn" class="icon-btn theme-toggle">
-                    <span class="icon-inner" id="icon-moon">
-                        <svg class="anim-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    </span>
-                    <span class="icon-inner" id="icon-sun">
-                        <svg class="anim-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    </span>
-                </button>
-            </div>
+        <header class="liquid-glass rounded-3xl p-4 mb-8 flex justify-between items-center z-40 relative">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-wider pl-2 text-white/90 drop-shadow-md">DATZON FEEDBACK</h1>
+            <a href="index.html" class="glass-button w-10 h-10 rounded-full flex items-center justify-center group" title="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/80 group-hover:text-white transition-colors">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
         </header>
 
-        <!-- Main Content -->
-        <main id="main-content">
-            <div class="view-container">
-                
-                <!-- View 1: Form Feedback -->
-                <div id="view-form" class="view-panel active-view">
-                    <div class="msg-card" style="padding: 24px;">
-                        <h2 class="card-title" style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-4 0h-4a3 3 0 0 0-4 0H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z"></path><path d="M8 18h1"></path><path d="M18.4 8.6 15 12l-3-3"></path><path d="M15 12v6"></path></svg>
-                            Submit Feedback
-                        </h2>
+        <!-- Container Halaman (View Container) -->
+        <main class="flex-1 view-container relative z-10">
+            
+            <!-- Halaman 1: Pengisian Form Feedback -->
+            <div id="view-form" class="view-panel active-view">
+                <div class="liquid-glass rounded-[2rem] p-6 sm:p-8">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <!-- Icon Command / Form -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M18 3a3 3 0 0 0-4 0h-4a3 3 0 0 0-4 0H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z"></path><path d="M8 18h1"></path><path d="M18.4 8.6 15 12l-3-3"></path><path d="M15 12v6"></path></svg>
+                        Submit Feedback
+                    </h2>
+                    
+                    <form id="feedbackForm" class="space-y-5">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-white/70 mb-1 ml-1">Your Name</label>
+                            <input type="text" id="name" required class="glass-input" placeholder="Name Your">
+                        </div>
                         
-                        <form id="feedbackForm">
-                            <label style="display:block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">Your Name</label>
-                            <input type="text" id="name" required class="input-field" placeholder="Name Your">
-                            
-                            <label style="display:block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">Subject</label>
-                            <input type="text" id="subject" required class="input-field" placeholder="Request Aplikasi dll">
-                            
-                            <label style="display:block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">Description</label>
-                            <textarea id="description" required rows="4" class="input-field" style="resize: none;" placeholder="Jelaskan apa masalahnya..."></textarea>
-                            
-                            <button type="submit" id="submitBtn" class="btn-primary" style="margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span>Send Feedback</span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                            </button>
-                        </form>
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-white/70 mb-1 ml-1">Subject</label>
+                            <input type="text" id="subject" required class="glass-input" placeholder="Request Aplikasi dll">
+                        </div>
+                        
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-white/70 mb-1 ml-1">Description</label>
+                            <textarea id="description" required rows="4" class="glass-input resize-none" placeholder="Jelaskan apa masalahnya..."></textarea>
+                        </div>
+                        
+                        <button type="submit" id="submitBtn" class="glass-button w-full rounded-2xl py-3.5 font-semibold text-lg flex justify-center items-center gap-2 mt-4 relative">
+                            <span>Send Feedback</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="translate-y-[1px]"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </form>
+                    
+                    <!-- Notifikasi Sukses -->
+                    <div id="toast" class="hidden mt-4 bg-green-500/20 border border-green-500/50 text-green-100 px-4 py-3 rounded-xl backdrop-blur-md text-sm text-center transition-all duration-300">
+                        Feedback submitted successfully!
                     </div>
                 </div>
+            </div>
 
-                <!-- View 2: Recent Activity / Inbox -->
-                <div id="view-activity" class="view-panel inactive-view">
-                    <div style="margin-bottom: 20px;">
-                        <h2 class="card-title" style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                            Recent Activity
-                        </h2>
-                    </div>
+            <!-- Halaman 2: Recent Activity / Inbox -->
+            <div id="view-activity" class="view-panel inactive-view">
+                <div class="liquid-glass-dark rounded-[2rem] p-6 sm:p-8 flex flex-col overflow-hidden h-[600px] sm:h-auto sm:min-h-[500px]">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
+                        <!-- Icon Inbox / History -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        Recent Activity
+                    </h2>
                     
-                    <div id="historyList">
+                    <!-- Daftar Histori -->
+                    <div id="historyList" class="flex-1 overflow-y-auto history-container pr-2 space-y-4">
                         <!-- State Loading -->
-                        <div id="loadingHistory" class="loading-history">
-                            <div class="spinner" style="border-width: 3px; width: 32px; height: 32px; border-top-color: var(--accent);"></div>
-                            Loading activities...
+                        <div id="loadingHistory" class="flex justify-center items-center h-full text-white/50 space-x-2">
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                         </div>
                     </div>
                 </div>
-                
             </div>
+            
         </main>
-
-        <!-- Floating Bottom Dock matching app.css -->
-        <div id="mainDock" class="bottom-dock feedback-dock">
-            <div id="dockIndicator" class="dock-indicator"></div>
-            
-            <!-- Tab 1: Feedback Form -->
-            <div class="dock-tab active-tab" data-index="0">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-4 0h-4a3 3 0 0 0-4 0H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z"></path></svg>
-                <span class="tab-text">Feedback</span>
-            </div>
-            
-            <!-- Tab 2: Activity History -->
-            <div class="dock-tab" data-index="1">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                <span class="tab-text">Activity</span>
-            </div>
-        </div>
-
-        <!-- Notification Toast -->
-        <div id="toast">Feedback submitted successfully!</div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Floating Bottom Dock (Ditambah select-none agar teks tidak keblokir) -->
+    <div id="mainDock" class="bottom-dock fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full p-1.5 flex items-center z-50 shadow-2xl select-none cursor-pointer">
+        
+        <!-- Bulatan Indikator -->
+        <div id="dockIndicator" class="dock-indicator absolute left-[6px] top-[6px] bottom-[6px] w-[calc(50%-6px)] rounded-full z-0 pointer-events-none origin-center"></div>
+        
+        <!-- Tab 1: Form Feedback -->
+        <div class="dock-tab active-tab relative z-10 flex items-center justify-center px-4 py-3 text-white/90 transition-colors w-32 sm:w-36" data-index="0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-4 0h-4a3 3 0 0 0-4 0H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z"></path></svg>
+            <span class="tab-text">Feedback</span>
+        </div>
+        
+        <!-- Tab 2: Activity / Inbox -->
+        <div class="dock-tab relative z-10 flex items-center justify-center px-4 py-3 text-white/50 transition-colors w-32 sm:w-36" data-index="1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+            <span class="tab-text">Activity</span>
+        </div>
+    </div>
+
+    <!-- SDK Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // --- THEME INITIALIZATION ---
-        const themeBtn = document.getElementById('theme-btn');
-        const html = document.documentElement;
-        
-        // Sync theme with main app if available in localStorage
-        const savedTheme = localStorage.getItem('datzon_theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-
-        themeBtn.addEventListener('click', () => {
-            const isLight = html.getAttribute('data-theme') === 'light';
-            const newTheme = isLight ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('datzon_theme', newTheme);
-        });
-
-        // --- FIREBASE CONFIG ---
+        // Konfigurasi Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCaCVfxYTP3IvR6Jrh3mM0GBsvYKJRjRe4",
             authDomain: "datzon-web.firebaseapp.com",
@@ -321,7 +301,8 @@
         const db = getFirestore(app);
         const feedbackCollectionName = 'feedback';
 
-        // --- DOCK NAVIGATION LOGIC (Kept identical to original) ---
+        // --- Logika Dock Navigasi (Drag & Switch) ---
+        
         const dock = document.getElementById('mainDock');
         const indicator = document.getElementById('dockIndicator');
         const tabs = document.querySelectorAll('.dock-tab');
@@ -334,12 +315,12 @@
         let baseTranslateX = 0;
         let maxTranslateX = 0;
 
+        // Fungsi mengubah tampilan halaman
         function setActiveTab(index) {
             activeIndex = index;
             
-            // Re-calc for safety
             const indicatorWidth = indicator.offsetWidth;
-            maxTranslateX = dock.offsetWidth - indicatorWidth - 12; // 12px total padding inner dock
+            maxTranslateX = dock.offsetWidth - indicatorWidth - 12; // 12 adalah total padding
             
             const targetX = index === 0 ? 0 : maxTranslateX;
             baseTranslateX = targetX;
@@ -347,11 +328,18 @@
             indicator.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.2s ease';
             indicator.style.transform = `translateX(${targetX}px) scale(1)`;
             
+            // Update class active-tab dan warna icon
             tabs.forEach((tab, i) => {
-                if(i === index) tab.classList.add('active-tab');
-                else tab.classList.remove('active-tab');
+                if(i === index) {
+                    tab.classList.add('active-tab');
+                    tab.classList.replace('text-white/50', 'text-white/90');
+                } else {
+                    tab.classList.remove('active-tab');
+                    tab.classList.replace('text-white/90', 'text-white/50');
+                }
             });
 
+            // Tampilkan panel halaman yang sesuai
             if (index === 0) {
                 viewForm.classList.replace('inactive-view', 'active-view');
                 viewActivity.classList.replace('active-view', 'inactive-view');
@@ -361,16 +349,19 @@
             }
         }
 
+        // Mulai drag indikator
         function startDockDrag(e) {
-            if (!dock || dock.offsetWidth === 0) return;
             isDragging = true;
             startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             
-            maxTranslateX = dock.offsetWidth - indicator.offsetWidth - 12;
+            const indicatorWidth = indicator.offsetWidth;
+            maxTranslateX = dock.offsetWidth - indicatorWidth - 12;
+            
             indicator.classList.add('lifted');
             indicator.style.transform = `translateX(${baseTranslateX}px) scale(1.05)`;
         }
 
+        // Proses saat jari digeser
         function moveDockDrag(e) {
             if (!isDragging) return;
             e.preventDefault(); 
@@ -379,12 +370,14 @@
             const deltaX = currentX - startX;
             
             let newX = baseTranslateX + deltaX;
+            
             if (newX < 0) newX = 0;
             if (newX > maxTranslateX) newX = maxTranslateX;
 
             indicator.style.transform = `translateX(${newX}px) scale(1.05)`;
         }
 
+        // Saat jari/mouse dilepas
         function endDockDrag(e) {
             if (!isDragging) return;
             isDragging = false;
@@ -402,7 +395,7 @@
         }
 
         dock.addEventListener('mousedown', startDockDrag);
-        window.addEventListener('mousemove', moveDockDrag, {passive: false});
+        window.addEventListener('mousemove', moveDockDrag);
         window.addEventListener('mouseup', endDockDrag);
 
         dock.addEventListener('touchstart', startDockDrag, {passive: false});
@@ -410,14 +403,16 @@
         window.addEventListener('touchend', endDockDrag);
 
         tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => setActiveTab(index));
+            tab.addEventListener('click', (e) => {
+                setActiveTab(index);
+            });
         });
 
-        // Init on load
+        // Setel default halaman
         setTimeout(() => setActiveTab(0), 100);
-        window.addEventListener('resize', () => { if(!isDragging) setActiveTab(activeIndex); });
 
-        // --- FIREBASE FORM & HISTORY LOGIC ---
+        // --- Logika Firebase Form & Histori ---
+
         const form = document.getElementById('feedbackForm');
         const submitBtn = document.getElementById('submitBtn');
         const toast = document.getElementById('toast');
@@ -432,10 +427,7 @@
             const description = document.getElementById('description').value;
 
             const originalBtnHtml = submitBtn.innerHTML;
-            
-            // Inline SVG spinner matching theme
-            const spinnerSvg = `<svg style="animation: spin 1s linear infinite; margin-right: 8px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke="#fff"></path></svg>`;
-            submitBtn.innerHTML = spinnerSvg + '<span>Sending...</span>';
+            submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
             submitBtn.disabled = true;
 
             try {
@@ -448,8 +440,8 @@
                 });
 
                 form.reset();
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 4000);
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 4000);
             } catch (error) {
                 console.error("Error adding document: ", error);
                 alert("Failed to send feedback.");
@@ -466,10 +458,10 @@
             
             if (snapshot.empty) {
                 historyList.innerHTML = `
-                    <div class="empty-history">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 16px auto; opacity: 0.3; display: block;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        <p style="margin-bottom: 8px; font-weight: 700; color: var(--text-main);">No feedback found yet.</p>
-                        <p style="font-size: 0.85rem;">Be the first to share your thoughts!</p>
+                    <div class="text-center text-white/40 py-10 flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                        <p>No feedback found yet.</p>
+                        <p class="text-sm">Be the first to share your thoughts!</p>
                     </div>`;
                 return;
             }
@@ -505,23 +497,24 @@
                         adminDateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(aDate);
                     }
                     adminResponseHtml = `
-                        <div class="admin-response">
-                            <div class="admin-meta">Admin Response &bull; ${adminDateStr}</div>
-                            <div class="admin-text">"${item.adminResponse}"</div>
+                        <div class="mt-3 pl-4 border-l-2 border-white/20 relative">
+                            <div class="absolute w-2 h-2 bg-purple-400 rounded-full -left-[5px] top-1.5 shadow-[0_0_8px_rgba(192,132,252,0.8)]"></div>
+                            <p class="text-xs text-white/50 mb-1">Admin Response <span class="ml-2">${adminDateStr}</span></p>
+                            <p class="text-sm text-white/90 italic">"${item.adminResponse}"</p>
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="history-card">
-                        <div class="history-card-header">
+                    <div class="bg-black/20 backdrop-blur-md rounded-2xl p-4 border border-white/5 shadow-sm hover:bg-black/30 transition-colors">
+                        <div class="flex justify-between items-start mb-2 gap-4">
                             <div>
-                                <h3 class="history-card-title">${escapeHtml(item.subject)}</h3>
-                                <p class="history-card-meta">${escapeHtml(item.name)} &bull; ${dateStr}</p>
+                                <h3 class="font-medium text-white/90 text-lg leading-tight">${escapeHtml(item.subject)}</h3>
+                                <p class="text-xs text-white/50 mt-1">${escapeHtml(item.name)} &bull; ${dateStr}</p>
                             </div>
-                            <span class="status-badge ${statusClass}">${statusStr}</span>
+                            <span class="status-badge ${statusClass} whitespace-nowrap">${statusStr}</span>
                         </div>
-                        <p class="history-card-desc">${escapeHtml(item.description)}</p>
+                        <p class="text-sm text-white/70 mt-2 leading-relaxed">${escapeHtml(item.description)}</p>
                         ${adminResponseHtml}
                     </div>
                 `;
@@ -535,4 +528,6 @@
     </script>
 </body>
 </html>
+
+
 
