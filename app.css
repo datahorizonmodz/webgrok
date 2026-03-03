@@ -363,12 +363,13 @@ main { padding: 80px 16px 100px 16px; }
 /* =========================================================
    DESKTOP MEDIA QUERY (ENHANCED WIDE 2-COLUMN LAYOUT)
    =========================================================
-   MANDATORY OVERRIDE FOR ANDROID DESKTOP MODE:
-   Kita menggunakan 980px agar saat pengguna HP menekan "Desktop Site" 
-   di Chrome, layout desktop LANGSUNG aktif di 100% zoom tanpa perlu 
-   di-zoom out menjadi 50% (karena Chrome mengunci lebar di 980px).
+   BREAKPOINT DITURUNKAN SECARA DRASTIS KE 700PX:
+   Ini adalah "Peluru Perak" untuk masalah zoom HP. Berapapun
+   DPI / Display Size bawaan HP Anda yang menskala ukuran layar, 
+   begitu Anda centang "Mode Desktop", Chrome akan melaporkan ukuran 
+   yang PASTI di atas 700px. Hasilnya: Mode Desktop LANGSUNG aktif di 100%.
 */
-@media (min-width: 980px) {
+@media (min-width: 700px) {
     /* ROOT RESET: MATIKAN FLEX CENTER DARI MOBILE SECARA PAKSA */
     body { 
         display: block !important; 
@@ -461,14 +462,14 @@ main { padding: 80px 16px 100px 16px; }
     
     /* Search Bar Selalu Terbuka pada Desktop */
     .search-wrapper, .search-wrapper.active {
-        position: relative; right: auto; width: 360px !important; height: 46px;
+        position: relative; right: auto; width: 260px !important; height: 46px;
         background: var(--surface); border: 1px solid var(--border);
         border-radius: 23px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         display: flex; align-items: center; opacity: 1 !important; pointer-events: all !important;
         transition: border-color 0.3s, box-shadow 0.3s, width 0.3s;
     }
     .search-wrapper:focus-within {
-        border-color: var(--accent); width: 420px !important;
+        border-color: var(--accent); width: 320px !important;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
     }
     .search-input { opacity: 1 !important; pointer-events: all !important; padding-left: 16px; width: 100%; }
@@ -481,7 +482,7 @@ main { padding: 80px 16px 100px 16px; }
     /* CENTER CONTENT LEBAR PENUH & RESPONSIF */
     main {
         flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; 
-        padding: 120px 48px 140px 48px !important; /* Bottom padding dilebarkan untuk dock */
+        padding: 120px 32px 140px 32px !important; /* Bottom padding dilebarkan untuk dock, samping 32px agar lega */
     }
     
     /* TETAPKAN BOTTOM DOCK PADA DESKTOP DAN POSISIKAN DI TENGAH KONTEN */
