@@ -41,10 +41,11 @@ function clearPools() {
 }
 
 // --- RESIZE LISTENER FOR VIRTUALIZED GRID RE-RENDER ---
-// Tersinkronisasi akurat dengan CSS breakpoint 980px agar Mobile Desktop langsung terpicu 2 kolom
-let currentCols = window.matchMedia('(min-width: 980px)').matches ? 2 : 1;
+// BREAKPOINT DITURUNKAN KE 700PX: 
+// Ini akan mendeteksi mode desktop Android Chrome di zoom 100% dengan sempurna.
+let currentCols = window.matchMedia('(min-width: 700px)').matches ? 2 : 1;
 window.addEventListener('resize', () => {
-    const newCols = window.matchMedia('(min-width: 980px)').matches ? 2 : 1;
+    const newCols = window.matchMedia('(min-width: 700px)').matches ? 2 : 1;
     if (newCols !== currentCols) {
         currentCols = newCols;
         clearPools();
@@ -168,7 +169,7 @@ function renderVirtualList(type) {
     }
     emptyEl.style.display = 'none';
 
-    // Kalkulasi Kolom Secara Akurat
+    // Kalkulasi Kolom Secara Akurat (akan bernilai 2 jika viewport > 700px)
     const cols = currentCols;
     const rowCount = Math.ceil(data.length / cols);
 
