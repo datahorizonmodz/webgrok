@@ -148,6 +148,8 @@ let baseTranslateX = 0;
 let maxTranslateX = 0;
 
 export function updateNavIndicator() {
+    if (!dock || dock.offsetWidth === 0) return; // Prevent calc errors on desktop when hidden
+
     const activeTab = Array.from(tabs).find(t => t.dataset.target === activePageId);
     if (!activeTab) return;
     
@@ -198,6 +200,8 @@ sideLinks.forEach(link => link.addEventListener('click', (e) => {
 
 // --- DOCK DRAG & LIFT LOGIC ---
 function startDockDrag(e) {
+    if (!dock || dock.offsetWidth === 0) return; // Guard for desktop
+
     isDragging = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     
