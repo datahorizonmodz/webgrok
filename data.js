@@ -41,9 +41,10 @@ function clearPools() {
 }
 
 // --- RESIZE LISTENER FOR VIRTUALIZED GRID RE-RENDER ---
-let currentCols = window.innerWidth >= 1024 ? 2 : 1;
+// Menggunakan matchMedia yang sangat akurat dengan resolusi CSS breakpoint
+let currentCols = window.matchMedia('(min-width: 1024px)').matches ? 2 : 1;
 window.addEventListener('resize', () => {
-    const newCols = window.innerWidth >= 1024 ? 2 : 1;
+    const newCols = window.matchMedia('(min-width: 1024px)').matches ? 2 : 1;
     if (newCols !== currentCols) {
         currentCols = newCols;
         clearPools();
@@ -95,7 +96,6 @@ function initFilters() {
             activeCategory = cat.toLowerCase();
             window.scrollTo(0,0);
             
-            // PENTING: Force Hancurkan Elemen lama agar Render ulang selalu trigger Animasi Mulus
             clearPools(); 
             renderActiveView();
         });
@@ -114,7 +114,6 @@ export function setPageFilter(text) {
     queryText = text.toLowerCase();
     window.scrollTo(0,0);
     
-    // PENTING: Hancurkan pool dan re-trigger animasi saat Search
     clearPools();
     renderActiveView();
 }
@@ -169,8 +168,8 @@ function renderVirtualList(type) {
     }
     emptyEl.style.display = 'none';
 
-    // Kalkulasi Kolom Layar
-    const cols = window.innerWidth >= 1024 ? 2 : 1;
+    // Kalkulasi Kolom Secara Akurat
+    const cols = currentCols;
     const rowCount = Math.ceil(data.length / cols);
 
     // Set height to preserve scrollbar based on rows
