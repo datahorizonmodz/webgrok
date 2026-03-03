@@ -41,10 +41,10 @@ function clearPools() {
 }
 
 // --- RESIZE LISTENER FOR VIRTUALIZED GRID RE-RENDER ---
-// Menggunakan matchMedia yang sangat akurat dengan resolusi CSS breakpoint
-let currentCols = window.matchMedia('(min-width: 1024px)').matches ? 2 : 1;
+// Tersinkronisasi akurat dengan CSS breakpoint 980px agar Mobile Desktop langsung terpicu 2 kolom
+let currentCols = window.matchMedia('(min-width: 980px)').matches ? 2 : 1;
 window.addEventListener('resize', () => {
-    const newCols = window.matchMedia('(min-width: 1024px)').matches ? 2 : 1;
+    const newCols = window.matchMedia('(min-width: 980px)').matches ? 2 : 1;
     if (newCols !== currentCols) {
         currentCols = newCols;
         clearPools();
