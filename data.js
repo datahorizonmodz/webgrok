@@ -256,6 +256,59 @@ function renderProfiles() {
     });
 }
 
+// --- PRICE RANGE CALCULATOR ---
+function getPriceRange(priceText) {
+    if (!priceText) return "Lihat detail harga";
+
+    const textArray = Array.isArray(priceText) ? priceText : [priceText];
+    let allPrices = [];
+
+    // Regex Explanation:
+    // 1. Rp[.\s]*(\d[\d.]*) -> Matches "Rp", optional dots/spaces, then captures numbers and dots (e.g. "Rp. 4.000")
+    // 2. |\b(\d{1,3}(?:\.\d{3})+)\b -> OR matches standalone numbers with thousands separators (e.g. "18.000")
+    const regex = /Rp[.\s]*(\d[\d.]*)|\b(\d{1,3}(?:\.\d{3})+)\b/gi;
+
+    textArray.forEach(text => {
+        if (typeof text !== 'string') return;
+        
+        // Reset regex index for safety since we're using the 'g' flag in a loop
+        regex.lastIndex = 0; 
+        let match;
+        
+        while ((match = regex.exec(text)) !== null) {
+            // Get the matched string from whichever capture group fired
+            let numStr = match[1] || match[2];
+            
+            if (numStr) {
+                // Strip out the formatting dots so we can parse as a clean integer
+                let cleanNumStr = numStr.replace(/[^\d]/g, '');
+                let num = parseInt(cleanNumStr, 10);
+                
+                if (!isNaN(num)) {
+                    allPrices.push(num);
+                }
+            }
+        }
+    });
+
+    // Fallback if no valid currency numbers were detected
+    if (allPrices.length === 0) {
+        return "Lihat detail harga";
+    }
+
+    const min = Math.min(...allPrices);
+    const max = Math.max(...allPrices);
+
+    // Format output with indonesian standard (Intl.NumberFormat id-ID natively adds dots for thousands)
+    const formatRp = (num) => "Rp. " + new Intl.NumberFormat('id-ID').format(num);
+
+    if (min === max) {
+        return formatRp(min);
+    } else {
+        return `${formatRp(min)} - ${formatRp(max)}`;
+    }
+}
+
 // DOM Node Builder
 function createCardNode(item, type) {
     const el = type === 'apps' ? document.createElement('a') : document.createElement('div');
@@ -272,7 +325,8 @@ function createCardNode(item, type) {
         const catDisp = Array.isArray(item.category) ? item.category.join(' - ') : (item.category || '');
         if(sub && catDisp) sub += ` - ${catDisp}`; else if (catDisp) sub = catDisp;
     } else if (type === 'store') {
-        sub = item.price || '-';
+        // --- PRICE RANGE INJECTION ---
+        sub = getPriceRange(item.priceText);
         el.style.cursor = 'pointer';
         el.addEventListener('click', () => populateProductModal(item));
     }
