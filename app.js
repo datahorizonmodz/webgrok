@@ -48,6 +48,9 @@ function finishLoader() {
     clearInterval(loaderInterval);
     document.getElementById('loader').classList.remove('active');
     checkActiveOverlays();
+    
+    // START ONBOARDING SETELAH LOADER HILANG (Dengan delay agar smooth)
+    setTimeout(initOnboarding, 500);
 }
 
 // --- OVERLAY / MODAL MANAGER ---
@@ -257,9 +260,145 @@ dock.addEventListener('touchstart', startDockDrag, {passive: false});
 window.addEventListener('touchmove', moveDockDrag, {passive: false});
 window.addEventListener('touchend', endDockDrag);
 
-// Adjust indicator on resize
+// --- ONBOARDING / GUIDED TOUR FEATURE ---
+let currentObStep = 0;
+const obSteps = [
+    {
+        text: "KLIK DISINI UNTUK MENCARI APLIKASI MOD ATAU KEMBALI KE HOME YAA, KAMU JUGA BISA SLIDE HALAMAN DENGAN MENEKAN BULATAN NYA YAA",
+        btn: "NEXT"
+    },
+    {
+        text: "KLIK DISINI UNTUK STORE YA, KALIAN BISA MEMBELI PREMIUM ACCOUNT YANG MURAH DAN TERPERCAYA YA",
+        btn: "NEXT"
+    },
+    {
+        text: "NAH DISINI UNTUK TEMPATNYA SOSMED DATZON YA, JANGAN LUPA UNTUK SUBSCRIBE FOLLOW DAN SUPPORT TERUS YA, TERIMAKASIH",
+        btn: "DONE"
+    }
+];
+
+function initOnboarding() {
+    // Mengecek apakah onboarding belum expired (24 jam)
+    const expiry = localStorage.getItem('datzon_onboarding_done_until');
+    if (expiry && Date.now() < parseInt(expiry)) return;
+    
+    const obContainer = document.getElementById('onboarding-container');
+    if(!obContainer) return;
+    
+    currentObStep = 0;
+    
+    // Set posisi Spotlight awal sesaat sebelum transisi opacity dimulai
+    updateOnboardingSpotlight(currentObStep);
+    renderObStepText(true); // true = start rendering without transition
+    
+    // Munculkan overlay hitam pelan-pelan
+    obContainer.classList.add('active');
+    
+    // Munculkan Popup Bubble secara smooth
+    setTimeout(() => {
+        const popup = document.getElementById('onboarding-popup');
+        popup.classList.add('visible');
+    }, 150);
+}
+
+function renderObStepText(isInit = false) {
+    const step = obSteps[currentObStep];
+    const textEl = document.getElementById('onboarding-text');
+    const btnEl = document.getElementById('onboarding-btn');
+    
+    if (isInit) {
+        textEl.textContent = step.text;
+        btnEl.textContent = step.btn;
+    } else {
+        // Animasi Teks saat ganti step
+        textEl.style.opacity = '0';
+        textEl.style.transform = 'translateY(5px)';
+        
+        setTimeout(() => {
+            textEl.textContent = step.text;
+            btnEl.textContent = step.btn;
+            textEl.style.opacity = '1';
+            textEl.style.transform = 'translateY(0)';
+        }, 150);
+    }
+    
+    updateOnboardingSpotlight(currentObStep);
+}
+
+function updateOnboardingSpotlight(index) {
+    const tab = tabs[index];
+    const dockEl = document.getElementById('mainDock');
+    if(!tab || !dockEl) return;
+    
+    // Dapatkan koordinat exact dari element Tab active dan Dock utuh
+    const rect = tab.getBoundingClientRect();
+    const dockRect = dockEl.getBoundingClientRect();
+    
+    // Padding oval agar spotlight sedikit lebih besar dari icon tab
+    const padX = 16; 
+    const padY = 10;
+    
+    const spotlight = document.getElementById('onboarding-spotlight');
+    spotlight.style.width = `${rect.width + padX * 2}px`;
+    spotlight.style.height = `${rect.height + padY * 2}px`;
+    spotlight.style.left = `${rect.left - padX}px`;
+    spotlight.style.top = `${rect.top - padY}px`;
+    
+    const popup = document.getElementById('onboarding-popup');
+    const arrow = document.getElementById('onboarding-arrow');
+    
+    // Tempatkan Popup Center TEPAT dengan Center dari Main Dock
+    // Ini membantu saat di view Desktop, dock tidak di tengah absolute layar
+    const dockCenter = dockRect.left + (dockRect.width / 2);
+    popup.style.left = `${dockCenter}px`;
+    
+    // Hitung kemana panah harus menunjuk.
+    // Menghitung selisih Center dari Tab Active dengan Center PopUp nya
+    const tabCenter = rect.left + (rect.width / 2);
+    let arrowOffset = tabCenter - dockCenter;
+    
+    // Batasi seberapa jauh arrow bisa geser ke kanan / kiri agar tidak keluar bubble
+    const maxOffset = 110;
+    if (arrowOffset > maxOffset) arrowOffset = maxOffset;
+    if (arrowOffset < -maxOffset) arrowOffset = -maxOffset;
+    
+    arrow.style.transform = `translateX(${arrowOffset}px)`;
+    
+    // Kalkulasi jarak dari bawah (Window Height - posisi Atas Dock) 
+    // agar PopUp pas berada di atas Dock (Mobile maupun Desktop)
+    const bottomOffset = window.innerHeight - dockRect.top + 18;
+    popup.style.bottom = `${bottomOffset}px`;
+}
+
+// Bind Onboarding Button Logic
+const obBtn = document.getElementById('onboarding-btn');
+if(obBtn) {
+    obBtn.addEventListener('click', () => {
+        if (currentObStep < obSteps.length - 1) {
+            currentObStep++;
+            renderObStepText();
+            // Optional: Mengganti halaman aplikasi secara live sesuai step
+            switchPage(tabs[currentObStep].dataset.target); 
+        } else {
+            // DONE - Save expiry logic for 24 hours
+            const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 Hours in ms
+            localStorage.setItem('datzon_onboarding_done_until', expiryTime.toString());
+            
+            // Clean close
+            document.getElementById('onboarding-container').classList.remove('active');
+            document.getElementById('onboarding-popup').classList.remove('visible');
+        }
+    });
+}
+
+// Adjust onboarding indicator on global resize
 window.addEventListener('resize', () => {
     if (!isDragging) updateNavIndicator();
+    
+    const obContainer = document.getElementById('onboarding-container');
+    if (obContainer && obContainer.classList.contains('active')) {
+        updateOnboardingSpotlight(currentObStep);
+    }
 });
 
 // --- MODAL SCROLL INDICATOR ---
