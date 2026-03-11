@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Testimonials - Liquid Glass iOS 26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Background Dinamis */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #1e3a8a, #4c1d95, #0f172a, #0369a1);
+            background-size: 300% 300%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            overscroll-behavior-y: none;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Bentuk abstrak di belakang kaca */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+        }
+        .shape1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #3b82f6; animation: float 10s infinite alternate; }
+        .shape2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #8b5cf6; animation: float 14s infinite alternate-reverse; }
+        .shape3 { top: 40%; left: 30%; width: 40vw; height: 40vw; background: #06b6d4; animation: float 12s infinite alternate; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Tema Liquid Glass Polished */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .liquid-glass-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .glass-button {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+        .glass-button:active { 
+            transform: scale(0.96) translateY(0);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+
+        /* Custom Scrollbar */
+        .history-container::-webkit-scrollbar { width: 6px; }
+        .history-container::-webkit-scrollbar-track { background: transparent; }
+        .history-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
+        /* Entrance Animation */
+        .enter-up { opacity: 0; visibility: hidden; will-change: transform, opacity; }
+        .page-enter .enter-up { visibility: visible; animation: enterUpScale 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes enterUpScale {
+            0% { opacity: 0; transform: translateY(24px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .delay-0 { animation-delay: 0ms; }
+        .delay-1 { animation-delay: 150ms; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .enter-up { opacity: 1; visibility: visible; transform: none; animation: none; }
+            .bg-shape { animation: none; transform: none; }
+            .glass-button:hover { transform: none; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500/30">
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
+
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6 min-h-screen flex flex-col relative pb-10">
+        
+        <!-- Header -->
+        <header class="liquid-glass rounded-3xl p-4 mb-6 flex justify-between items-center z-40 relative enter-up delay-0">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-wider pl-2 text-white/90 drop-shadow-md">DATZON REVIEWS</h1>
+            <a href="index.html" class="glass-button w-10 h-10 rounded-full flex items-center justify-center group" title="Home">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/80 group-hover:text-white transition-colors">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
+        </header>
+
+        <!-- Rating Summary Block -->
+        <div class="liquid-glass rounded-3xl p-6 sm:p-8 mb-6 flex flex-col md:flex-row items-center gap-8 relative z-10 enter-up delay-1">
+            <div class="flex flex-col items-center md:items-start min-w-[140px] shrink-0">
+                <h2 id="avgRatingNumber" class="text-7xl font-bold tracking-tighter text-white drop-shadow-md leading-none mb-3">0,0</h2>
+                <div id="avgRatingStars" class="flex items-center gap-1 mb-2"></div>
+                <p class="text-sm font-medium text-white/60 tracking-wide" id="totalReviewsCount">0 Reviews</p>
+            </div>
+
+            <div class="flex-1 w-full flex flex-col gap-2.5">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-white/80 w-3 text-right">5</span>
+                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div id="bar5" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-white/80 w-3 text-right">4</span>
+                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div id="bar4" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-white/80 w-3 text-right">3</span>
+                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div id="bar3" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-white/80 w-3 text-right">2</span>
+                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div id="bar2" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-white/80 w-3 text-right">1</span>
+                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                        <div id="bar1" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Testimonial List -->
+        <main class="flex-1 relative z-10">
+            <div class="liquid-glass-dark rounded-[2rem] p-6 sm:p-8 flex flex-col overflow-hidden h-[600px] sm:h-auto sm:min-h-[500px] enter-up delay-1">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    Customer Stories
+                </h2>
+                
+                <div id="testimonialList" class="flex-1 overflow-y-auto history-container pr-2 space-y-5">
+                    <div id="loadingTestimonials" class="flex justify-center items-center h-full text-white/50 space-x-2">
+                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Full Image View (View Photo) -->
+    <div id="imageModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md transition-opacity duration-300 opacity-0 px-4" onclick="closeImageModal()">
+        <div class="relative w-full max-w-3xl flex flex-col items-center justify-center transform scale-95 transition-transform duration-300" id="imageModalContent" onclick="event.stopPropagation()">
+            <!-- Close Button -->
+            <button onclick="closeImageModal()" class="absolute -top-14 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full backdrop-blur-md transition-all shadow-lg border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <img id="modalImage" src="" class="w-auto h-auto max-w-full max-h-[85vh] rounded-[1.5rem] shadow-2xl border border-white/10 object-contain">
+        </div>
+    </div>
+
+    <!-- Entrance Animation -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add("page-enter");
+        });
+    </script>
+
+    <!-- SDK Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaCVfxYTP3IvR6Jrh3mM0GBsvYKJRjRe4",
+            authDomain: "datzon-web.firebaseapp.com",
+            projectId: "datzon-web",
+            storageBucket: "datzon-web.firebasestorage.app",
+            messagingSenderId: "310892115798",
+            appId: "1:310892115798:web:a03fb9d2b2137933b948f7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Fungsi Global untuk Image Modal
+        window.openImageModal = function(url) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalContent = document.getElementById('imageModalContent');
+
+            modalImg.src = url;
+            modal.classList.remove('hidden');
+
+            // Trigger enter animation
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        window.closeImageModal = function() {
+            const modal = document.getElementById('imageModal');
+            const modalContent = document.getElementById('imageModalContent');
+
+            // Trigger exit animation
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('modalImage').src = "";
+            }, 300);
+        }
+
+        function generateAverageStarsHtml(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                let fillPercent = 0;
+                if (rating >= i) fillPercent = 100;
+                else if (rating > i - 1) fillPercent = (rating - (i - 1)) * 100;
+
+                html += `
+                <div class="relative w-5 h-5 sm:w-6 sm:h-6">
+                    <svg class="absolute inset-0 w-full h-full text-white/20" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                    <div class="absolute inset-0 overflow-hidden" style="width: ${fillPercent}%">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                    </div>
+                </div>`;
+            }
+            return html;
+        }
+
+        const testimonialsListDiv = document.getElementById('testimonialList');
+        const loadingDiv = document.getElementById('loadingTestimonials');
+
+        onSnapshot(collection(db, 'testimonials'), (snapshot) => {
+            loadingDiv.style.display = 'none';
+            
+            let totalReviews = 0;
+            let sumRating = 0;
+            let starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            
+            if (snapshot.empty) {
+                document.getElementById('avgRatingNumber').innerText = "0,0";
+                document.getElementById('totalReviewsCount').innerText = "0 Reviews";
+                document.getElementById('avgRatingStars').innerHTML = generateAverageStarsHtml(0);
+                for (let i = 1; i <= 5; i++) document.getElementById('bar'+i).style.width = '0%';
+                
+                testimonialsListDiv.innerHTML = `
+                    <div class="text-center text-white/40 py-10 flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <p>No reviews yet.</p>
+                    </div>`;
+                return;
+            }
+
+            let testimonials = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                testimonials.push({ id: doc.id, ...data });
+                
+                const r = typeof data.rating === 'number' ? data.rating : 5;
+                if (r >= 1 && r <= 5) {
+                    starCounts[r]++;
+                    sumRating += r;
+                    totalReviews++;
+                }
+            });
+            
+            if (totalReviews > 0) {
+                const avg = (sumRating / totalReviews).toFixed(1);
+                document.getElementById('avgRatingNumber').innerText = avg.replace('.', ',');
+                document.getElementById('totalReviewsCount').innerText = totalReviews.toLocaleString('id-ID') + (totalReviews > 1 ? " Reviews" : " Review");
+                document.getElementById('avgRatingStars').innerHTML = generateAverageStarsHtml(parseFloat(avg));
+                
+                for (let i = 1; i <= 5; i++) {
+                    const percentage = (starCounts[i] / totalReviews) * 100;
+                    document.getElementById('bar'+i).style.width = percentage + '%';
+                }
+            }
+            
+            testimonials.sort((a, b) => {
+                const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+                const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+                return timeB - timeA;
+            });
+
+            testimonialsListDiv.innerHTML = testimonials.map(item => {
+                let dateStr = "Just now";
+                if (item.createdAt) {
+                    const date = item.createdAt.toDate();
+                    dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+                }
+
+                const ratingNum = typeof item.rating === 'number' ? item.rating : 5; 
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= ratingNum) {
+                        starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.6)]"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
+                    } else {
+                        starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
+                    }
+                }
+
+                // Struktur View Photo Button Overlap
+                let imageHtml = '';
+                if(item.imageUrl) {
+                    imageHtml = `
+                    <div class="relative group w-full overflow-hidden rounded-t-[1.35rem]">
+                        <img src="${escapeHtml(item.imageUrl)}" class="w-full h-48 sm:h-56 object-cover border-b border-white/10 cursor-pointer transition-transform duration-500 group-hover:scale-105" onclick="openImageModal('${escapeHtml(item.imageUrl)}')" alt="Customer Screenshot">
+                        <button onclick="openImageModal('${escapeHtml(item.imageUrl)}')" class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white/95 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-white/20 hover:bg-black/80 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                            View Photo
+                        </button>
+                    </div>`;
+                }
+
+                return `
+                    <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 shadow-sm hover:bg-black/30 transition-colors flex flex-col">
+                        ${imageHtml}
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2 gap-2">
+                                <div>
+                                    <h3 class="font-semibold text-white/90 text-lg leading-tight flex items-center gap-2">
+                                        ${escapeHtml(item.customerName)}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-blue-400"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </h3>
+                                    <p class="text-xs text-white/50 mt-1">${escapeHtml(item.productName)} &bull; ${dateStr}</p>
+                                </div>
+                                <div class="flex gap-0.5 mt-1">
+                                    ${starsHtml}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 mt-1">
+                                <span class="inline-block bg-blue-500/20 border border-blue-500/50 text-blue-200 text-xs px-2.5 py-1 rounded-lg">
+                                    ${escapeHtml(item.selectedPrice)}
+                                </span>
+                            </div>
+                            
+                            ${item.message ? `<p class="text-sm text-white/80 mt-2 leading-relaxed italic">"${escapeHtml(item.message)}"</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
+
+
