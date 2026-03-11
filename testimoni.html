@@ -65,6 +65,38 @@
             box-shadow: 0 8px 25px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
         }
 
+        /* Elemen Input & Tombol */
+        .glass-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 12px 16px;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        select.glass-input option {
+            background: #1e293b;
+            color: white;
+            padding: 10px;
+        }
+        
+        select.glass-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.25);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4), inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         .glass-button {
             background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -73,20 +105,117 @@
             overflow: hidden;
             cursor: pointer;
         }
-        .glass-button:hover {
+        .glass-button:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
         }
-        .glass-button:active { 
+        .glass-button:active:not(:disabled) { 
             transform: scale(0.96) translateY(0);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+        .glass-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Star Rating Interactivity */
+        .star-icon {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .star-icon:active {
+            transform: scale(0.85);
+        }
+
+        /* Custom File Input Upload Styling */
+        input[type="file"]::file-selector-button {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #bfdbfe;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            margin-right: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: rgba(59, 130, 246, 0.4);
         }
 
         /* Custom Scrollbar */
         .history-container::-webkit-scrollbar { width: 6px; }
         .history-container::-webkit-scrollbar-track { background: transparent; }
         .history-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
+        /* =========================================================
+           VIEW PANEL STACKING (Dock Navigation)
+           ========================================================= */
+        .view-container {
+            display: grid;
+            grid-template-areas: "stack";
+            width: 100%;
+        }
+        .view-panel {
+            grid-area: stack;
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+        }
+        .view-panel.active-view {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 10;
+        }
+        .view-panel.inactive-view {
+            opacity: 0;
+            transform: translateY(15px);
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* =========================================================
+           FLOATING BOTTOM DOCK (iOS 26 Style)
+           ========================================================= */
+        .bottom-dock {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.5);
+            touch-action: none; 
+        }
+        .dock-indicator {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255,255,255,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .dock-indicator.lifted {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.2);
+            transition: none;
+        }
+
+        /* Text Expand Animation in Dock */
+        .tab-text {
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            margin-left: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .active-tab .tab-text {
+            max-width: 100px; 
+            opacity: 1;
+            margin-left: 8px; 
+        }
 
         /* Entrance Animation */
         .enter-up { opacity: 0; visibility: hidden; will-change: transform, opacity; }
@@ -97,6 +226,7 @@
         }
         .delay-0 { animation-delay: 0ms; }
         .delay-1 { animation-delay: 150ms; }
+        .delay-2 { animation-delay: 300ms; }
 
         @media (prefers-reduced-motion: reduce) {
             .enter-up { opacity: 1; visibility: visible; transform: none; animation: none; }
@@ -111,11 +241,13 @@
     <div class="bg-shape shape2"></div>
     <div class="bg-shape shape3"></div>
 
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6 min-h-screen flex flex-col relative pb-10">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-6 min-h-screen flex flex-col relative pb-32">
         
         <!-- Header -->
         <header class="liquid-glass rounded-3xl p-4 mb-6 flex justify-between items-center z-40 relative enter-up delay-0">
             <h1 class="text-xl sm:text-2xl font-bold tracking-wider pl-2 text-white/90 drop-shadow-md">DATZON REVIEWS</h1>
+            
+            <!-- Home Button -->
             <a href="index.html" class="glass-button w-10 h-10 rounded-full flex items-center justify-center group" title="Home">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/80 group-hover:text-white transition-colors">
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -124,73 +256,193 @@
             </a>
         </header>
 
-        <!-- Rating Summary Block -->
-        <div class="liquid-glass rounded-3xl p-6 sm:p-8 mb-6 flex flex-col md:flex-row items-center gap-8 relative z-10 enter-up delay-1">
-            <div class="flex flex-col items-center md:items-start min-w-[140px] shrink-0">
-                <h2 id="avgRatingNumber" class="text-7xl font-bold tracking-tighter text-white drop-shadow-md leading-none mb-3">0,0</h2>
-                <div id="avgRatingStars" class="flex items-center gap-1 mb-2"></div>
-                <p class="text-sm font-medium text-white/60 tracking-wide" id="totalReviewsCount">0 Reviews</p>
+        <!-- View Container (Stack Panel Sistem) -->
+        <main class="flex-1 view-container relative z-10">
+            
+            <!-- VIEW 1: CUSTOMER STORIES (Summary + List) -->
+            <div id="view-list" class="view-panel active-view flex flex-col gap-6">
+                <!-- Rating Summary Block -->
+                <div class="liquid-glass rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center gap-8 relative z-10 enter-up delay-1">
+                    <div class="flex flex-col items-center md:items-start min-w-[140px] shrink-0">
+                        <h2 id="avgRatingNumber" class="text-7xl font-bold tracking-tighter text-white drop-shadow-md leading-none mb-3">0,0</h2>
+                        <div id="avgRatingStars" class="flex items-center gap-1 mb-2"></div>
+                        <p class="text-sm font-medium text-white/60 tracking-wide" id="totalReviewsCount">0 Reviews</p>
+                    </div>
+
+                    <div class="flex-1 w-full flex flex-col gap-2.5">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-white/80 w-3 text-right">5</span>
+                            <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div id="bar5" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-white/80 w-3 text-right">4</span>
+                            <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div id="bar4" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-white/80 w-3 text-right">3</span>
+                            <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div id="bar3" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-white/80 w-3 text-right">2</span>
+                            <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div id="bar2" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-white/80 w-3 text-right">1</span>
+                            <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div id="bar1" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial List Block -->
+                <div class="liquid-glass-dark rounded-[2rem] p-6 sm:p-8 flex flex-col overflow-hidden max-h-[500px] sm:max-h-[600px] enter-up delay-2">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 border-b border-white/10 pb-4 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Customer Stories
+                    </h2>
+                    
+                    <div id="testimonialList" class="flex-1 overflow-y-auto history-container pr-2 space-y-5">
+                        <div id="loadingTestimonials" class="flex justify-center items-center h-full text-white/50 space-x-2">
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex-1 w-full flex flex-col gap-2.5">
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-white/80 w-3 text-right">5</span>
-                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div id="bar5" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+            <!-- VIEW 2: WRITE REVIEW FORM -->
+            <div id="view-form" class="view-panel inactive-view">
+                <div class="liquid-glass rounded-[2rem] p-6 sm:p-8 enter-up delay-1">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400">
+                            <path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 Z"></path>
+                        </svg>
+                        Write a Review
+                    </h2>
+                    
+                    <form id="testimonialForm" class="space-y-5">
+                        <!-- Name & Anonymous Button -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1 px-1">
+                                <label for="name" class="block text-sm font-medium text-white/70">Your Name</label>
+                                <button type="button" onclick="generateAnonName()" class="text-[11px] font-bold text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg transition-colors tracking-wide">TIDAK ISI NAMA</button>
+                            </div>
+                            <input type="text" id="name" required class="glass-input" placeholder="e.g. John Doe">
+                        </div>
+                        
+                        <!-- Product Selection -->
+                        <div>
+                            <label for="productSelect" class="block text-sm font-medium text-white/70 mb-1 ml-1">Product Bought</label>
+                            <select id="productSelect" required class="glass-input appearance-none">
+                                <option value="" disabled selected>Loading products...</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Dynamic Price Selection -->
+                        <div>
+                            <label for="priceSelect" class="block text-sm font-medium text-white/70 mb-1 ml-1">Purchased Variant</label>
+                            <select id="priceSelect" required class="glass-input appearance-none" disabled>
+                                <option value="" disabled selected>Select product first</option>
+                            </select>
+                        </div>
+
+                        <!-- Interactive Star Rating -->
+                        <div>
+                            <label class="block text-sm font-medium text-white/70 mb-2 ml-1">Rate Your Experience</label>
+                            <div class="flex items-center gap-2 ml-1" id="starRatingContainer">
+                                <svg data-value="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="star-icon w-8 h-8 cursor-pointer text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                                <svg data-value="2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="star-icon w-8 h-8 cursor-pointer text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                                <svg data-value="3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="star-icon w-8 h-8 cursor-pointer text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                                <svg data-value="4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="star-icon w-8 h-8 cursor-pointer text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                                <svg data-value="5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="star-icon w-8 h-8 cursor-pointer text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+
+                        <!-- Screenshot Upload (With Toggle Button) -->
+                        <div id="imageUploadSection">
+                            <div class="flex justify-between items-end mb-1 px-1">
+                                <label for="image" class="block text-sm font-medium text-white/70">Upload Screenshot</label>
+                                <button type="button" id="togglePhotoBtn" onclick="toggleNoPhoto()" class="text-[11px] font-bold text-blue-300 bg-blue-500/20 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg transition-colors tracking-wide">TIDAK ADA FOTO</button>
+                            </div>
+                            
+                            <!-- State 1: Require Image Input -->
+                            <div id="imageInputContainer">
+                                <input type="file" id="image" accept="image/*" required class="glass-input text-sm text-white/70 file:transition-all">
+                            </div>
+
+                            <!-- State 2: No Image Placeholder -->
+                            <div id="noPhotoPlaceholder" class="hidden w-full bg-black/20 border-2 border-dashed border-white/10 rounded-2xl py-6 flex flex-col items-center justify-center gap-2 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-white/40"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.05-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg>
+                                <span class="text-sm font-medium text-white/50">No screenshot attached</span>
+                            </div>
+                            
+                            <!-- Image Preview Area -->
+                            <div id="previewContainer" class="hidden mt-3 relative rounded-xl overflow-hidden border border-white/20 bg-black/20">
+                                <img id="imagePreview" src="" alt="Preview" class="w-full h-48 object-cover">
+                                <button type="button" id="removeImageBtn" class="absolute top-2 right-2 bg-black/50 hover:bg-red-500/80 text-white p-1.5 rounded-full backdrop-blur-md transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-white/70 mb-1 ml-1">Message (Optional)</label>
+                            <textarea id="message" rows="3" class="glass-input resize-none" placeholder="Share your experience..."></textarea>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" id="submitBtn" class="glass-button w-full rounded-2xl py-3.5 font-semibold text-lg flex justify-center items-center gap-2 mt-4 relative">
+                            <span>Submit Review</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="translate-y-[1px]"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </form>
+                    
+                    <!-- Success Notif -->
+                    <div id="toast" class="hidden mt-4 bg-green-500/20 border border-green-500/50 text-green-100 px-4 py-3 rounded-xl backdrop-blur-md text-sm text-center transition-all duration-300">
+                        Testimonial submitted successfully!
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-white/80 w-3 text-right">4</span>
-                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div id="bar4" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-white/80 w-3 text-right">3</span>
-                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div id="bar3" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-white/80 w-3 text-right">2</span>
-                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div id="bar2" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-bold text-white/80 w-3 text-right">1</span>
-                    <div class="h-3.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
-                        <div id="bar1" class="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
-                    </div>
-                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Floating Bottom Dock Navigation -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full">
+        <div id="mainDock" class="bottom-dock rounded-full p-1.5 flex items-center shadow-2xl select-none cursor-pointer enter-up delay-2">
+            
+            <div id="dockIndicator" class="dock-indicator absolute left-[6px] top-[6px] bottom-[6px] w-[calc(50%-6px)] rounded-full z-0 pointer-events-none origin-center"></div>
+            
+            <!-- Tab 1: Stories -->
+            <div class="dock-tab active-tab relative z-10 flex items-center justify-center px-4 py-3 text-white/90 transition-colors w-32 sm:w-40" data-index="0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span class="tab-text">Stories</span>
+            </div>
+            
+            <!-- Tab 2: Write Review -->
+            <div class="dock-tab relative z-10 flex items-center justify-center px-4 py-3 text-white/50 transition-colors w-32 sm:w-40" data-index="1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 Z"></path></svg>
+                <span class="tab-text">Write Review</span>
             </div>
         </div>
-
-        <!-- Main Testimonial List -->
-        <main class="flex-1 relative z-10">
-            <div class="liquid-glass-dark rounded-[2rem] p-6 sm:p-8 flex flex-col overflow-hidden h-[600px] sm:h-auto sm:min-h-[500px] enter-up delay-1">
-                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    Customer Stories
-                </h2>
-                
-                <div id="testimonialList" class="flex-1 overflow-y-auto history-container pr-2 space-y-5">
-                    <div id="loadingTestimonials" class="flex justify-center items-center h-full text-white/50 space-x-2">
-                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce"></div>
-                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                        <div class="w-2 h-2 bg-white/50 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
     </div>
 
     <!-- Modal for Full Image View (View Photo) -->
     <div id="imageModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/85 backdrop-blur-md transition-opacity duration-300 opacity-0 px-4" onclick="closeImageModal()">
         <div class="relative w-full max-w-3xl flex flex-col items-center justify-center transform scale-95 transition-transform duration-300" id="imageModalContent" onclick="event.stopPropagation()">
-            <!-- Close Button -->
             <button onclick="closeImageModal()" class="absolute -top-14 right-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2.5 rounded-full backdrop-blur-md transition-all shadow-lg border border-white/10">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -205,11 +457,12 @@
         });
     </script>
 
-    <!-- SDK Firebase -->
+    <!-- SDK Firebase & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         
+        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyCaCVfxYTP3IvR6Jrh3mM0GBsvYKJRjRe4",
             authDomain: "datzon-web.firebaseapp.com",
@@ -219,19 +472,103 @@
             appId: "1:310892115798:web:a03fb9d2b2137933b948f7"
         };
 
+        const CLOUDINARY_CLOUD_NAME = "dwctfnwdu"; 
+        const CLOUDINARY_UPLOAD_PRESET = "datzon"; 
+        const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Fungsi Global untuk Image Modal
+        // --- 2. DOCK NAVIGATION LOGIC ---
+        const dock = document.getElementById('mainDock');
+        const indicator = document.getElementById('dockIndicator');
+        const tabs = document.querySelectorAll('.dock-tab');
+        const viewList = document.getElementById('view-list');
+        const viewForm = document.getElementById('view-form');
+        
+        let activeIndex = 0;
+        let isDragging = false;
+        let startX = 0;
+        let baseTranslateX = 0;
+        let maxTranslateX = 0;
+
+        function setActiveTab(index) {
+            activeIndex = index;
+            const indicatorWidth = indicator.offsetWidth;
+            maxTranslateX = dock.offsetWidth - indicatorWidth - 12; 
+            
+            const targetX = index === 0 ? 0 : maxTranslateX;
+            baseTranslateX = targetX;
+            
+            indicator.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s ease, background 0.2s ease';
+            indicator.style.transform = `translateX(${targetX}px) scale(1)`;
+            
+            tabs.forEach((tab, i) => {
+                if(i === index) {
+                    tab.classList.add('active-tab');
+                    tab.classList.replace('text-white/50', 'text-white/90');
+                } else {
+                    tab.classList.remove('active-tab');
+                    tab.classList.replace('text-white/90', 'text-white/50');
+                }
+            });
+
+            if (index === 0) {
+                viewList.classList.replace('inactive-view', 'active-view');
+                viewForm.classList.replace('active-view', 'inactive-view');
+            } else {
+                viewForm.classList.replace('inactive-view', 'active-view');
+                viewList.classList.replace('active-view', 'inactive-view');
+            }
+        }
+
+        function startDockDrag(e) {
+            isDragging = true;
+            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            maxTranslateX = dock.offsetWidth - indicator.offsetWidth - 12;
+            indicator.classList.add('lifted');
+            indicator.style.transform = `translateX(${baseTranslateX}px) scale(1.05)`;
+        }
+
+        function moveDockDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault(); 
+            const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const deltaX = currentX - startX;
+            let newX = baseTranslateX + deltaX;
+            if (newX < 0) newX = 0;
+            if (newX > maxTranslateX) newX = maxTranslateX;
+            indicator.style.transform = `translateX(${newX}px) scale(1.05)`;
+        }
+
+        function endDockDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            indicator.classList.remove('lifted');
+            const match = indicator.style.transform.match(/translateX\(([-\d.]+)px\)/);
+            const currentX = match ? parseFloat(match[1]) : baseTranslateX;
+            const threshold = maxTranslateX / 2;
+            setActiveTab(currentX > threshold ? 1 : 0);
+        }
+
+        dock.addEventListener('mousedown', startDockDrag);
+        window.addEventListener('mousemove', moveDockDrag);
+        window.addEventListener('mouseup', endDockDrag);
+        dock.addEventListener('touchstart', startDockDrag, {passive: false});
+        window.addEventListener('touchmove', moveDockDrag, {passive: false});
+        window.addEventListener('touchend', endDockDrag);
+
+        tabs.forEach((tab, index) => tab.addEventListener('click', () => setActiveTab(index)));
+        setTimeout(() => setActiveTab(0), 100);
+
+
+        // --- 3. MODAL & UI UTILS ---
         window.openImageModal = function(url) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             const modalContent = document.getElementById('imageModalContent');
-
             modalImg.src = url;
             modal.classList.remove('hidden');
-
-            // Trigger enter animation
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modalContent.classList.remove('scale-95');
@@ -241,16 +578,22 @@
         window.closeImageModal = function() {
             const modal = document.getElementById('imageModal');
             const modalContent = document.getElementById('imageModalContent');
-
-            // Trigger exit animation
             modal.classList.add('opacity-0');
             modalContent.classList.add('scale-95');
-
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.getElementById('modalImage').src = "";
             }, 300);
         }
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // --- 4. FETCH TESTIMONIALS & STATS ---
+        const testimonialsListDiv = document.getElementById('testimonialList');
+        const loadingDiv = document.getElementById('loadingTestimonials');
 
         function generateAverageStarsHtml(rating) {
             let html = '';
@@ -258,7 +601,6 @@
                 let fillPercent = 0;
                 if (rating >= i) fillPercent = 100;
                 else if (rating > i - 1) fillPercent = (rating - (i - 1)) * 100;
-
                 html += `
                 <div class="relative w-5 h-5 sm:w-6 sm:h-6">
                     <svg class="absolute inset-0 w-full h-full text-white/20" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>
@@ -270,14 +612,9 @@
             return html;
         }
 
-        const testimonialsListDiv = document.getElementById('testimonialList');
-        const loadingDiv = document.getElementById('loadingTestimonials');
-
         onSnapshot(collection(db, 'testimonials'), (snapshot) => {
             loadingDiv.style.display = 'none';
-            
-            let totalReviews = 0;
-            let sumRating = 0;
+            let totalReviews = 0, sumRating = 0;
             let starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
             
             if (snapshot.empty) {
@@ -298,13 +635,8 @@
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 testimonials.push({ id: doc.id, ...data });
-                
                 const r = typeof data.rating === 'number' ? data.rating : 5;
-                if (r >= 1 && r <= 5) {
-                    starCounts[r]++;
-                    sumRating += r;
-                    totalReviews++;
-                }
+                if (r >= 1 && r <= 5) { starCounts[r]++; sumRating += r; totalReviews++; }
             });
             
             if (totalReviews > 0) {
@@ -312,11 +644,7 @@
                 document.getElementById('avgRatingNumber').innerText = avg.replace('.', ',');
                 document.getElementById('totalReviewsCount').innerText = totalReviews.toLocaleString('id-ID') + (totalReviews > 1 ? " Reviews" : " Review");
                 document.getElementById('avgRatingStars').innerHTML = generateAverageStarsHtml(parseFloat(avg));
-                
-                for (let i = 1; i <= 5; i++) {
-                    const percentage = (starCounts[i] / totalReviews) * 100;
-                    document.getElementById('bar'+i).style.width = percentage + '%';
-                }
+                for (let i = 1; i <= 5; i++) document.getElementById('bar'+i).style.width = ((starCounts[i] / totalReviews) * 100) + '%';
             }
             
             testimonials.sort((a, b) => {
@@ -327,34 +655,26 @@
 
             testimonialsListDiv.innerHTML = testimonials.map(item => {
                 let dateStr = "Just now";
-                if (item.createdAt) {
-                    const date = item.createdAt.toDate();
-                    dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-                }
-
+                if (item.createdAt) dateStr = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(item.createdAt.toDate());
                 const ratingNum = typeof item.rating === 'number' ? item.rating : 5; 
                 let starsHtml = '';
                 for (let i = 1; i <= 5; i++) {
-                    if (i <= ratingNum) {
-                        starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.6)]"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
-                    } else {
-                        starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-white/20"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
-                    }
+                    starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 ${i <= ratingNum ? 'text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.6)]' : 'text-white/20'}"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`;
                 }
-
-                // Struktur View Photo Button Overlap
+                
+                // Murni Adaptif untuk Testimoni Tanpa Gambar
                 let imageHtml = '';
-                if(item.imageUrl) {
+                if(item.imageUrl && item.imageUrl !== "") {
                     imageHtml = `
                     <div class="relative group w-full overflow-hidden rounded-t-[1.35rem]">
                         <img src="${escapeHtml(item.imageUrl)}" class="w-full h-48 sm:h-56 object-cover border-b border-white/10 cursor-pointer transition-transform duration-500 group-hover:scale-105" onclick="openImageModal('${escapeHtml(item.imageUrl)}')" alt="Customer Screenshot">
                         <button onclick="openImageModal('${escapeHtml(item.imageUrl)}')" class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white/95 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-white/20 hover:bg-black/80 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                            View Photo
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> View Photo
                         </button>
                     </div>`;
                 }
 
+                // Layout Box
                 return `
                     <div class="bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 shadow-sm hover:bg-black/30 transition-colors flex flex-col">
                         ${imageHtml}
@@ -367,17 +687,11 @@
                                     </h3>
                                     <p class="text-xs text-white/50 mt-1">${escapeHtml(item.productName)} &bull; ${dateStr}</p>
                                 </div>
-                                <div class="flex gap-0.5 mt-1">
-                                    ${starsHtml}
-                                </div>
+                                <div class="flex gap-0.5 mt-1">${starsHtml}</div>
                             </div>
-                            
                             <div class="mb-3 mt-1">
-                                <span class="inline-block bg-blue-500/20 border border-blue-500/50 text-blue-200 text-xs px-2.5 py-1 rounded-lg">
-                                    ${escapeHtml(item.selectedPrice)}
-                                </span>
+                                <span class="inline-block bg-blue-500/20 border border-blue-500/50 text-blue-200 text-xs px-2.5 py-1 rounded-lg">${escapeHtml(item.selectedPrice)}</span>
                             </div>
-                            
                             ${item.message ? `<p class="text-sm text-white/80 mt-2 leading-relaxed italic">"${escapeHtml(item.message)}"</p>` : ''}
                         </div>
                     </div>
@@ -385,12 +699,209 @@
             }).join('');
         });
 
-        function escapeHtml(unsafe) {
-            if (!unsafe) return "";
-            return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        // --- 5. FORM LOGIC & SUBMISSION ---
+        
+        // Random Anonymous Name Generator
+        window.generateAnonName = function() {
+            const prefixes = ["Anonymous User", "User Anon", "Anon", "Guest", "Hidden User"];
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const suffix = Math.floor(Math.random() * 9000) + 1000;
+            document.getElementById('name').value = `${prefix} ${suffix}`;
+        };
+
+        // No-Photo Toggle Logic
+        window.isNoPhoto = false;
+        window.toggleNoPhoto = function() {
+            window.isNoPhoto = !window.isNoPhoto;
+            
+            const btn = document.getElementById('togglePhotoBtn');
+            const imgContainer = document.getElementById('imageInputContainer');
+            const placeholder = document.getElementById('noPhotoPlaceholder');
+            const preview = document.getElementById('previewContainer');
+            const imgInput = document.getElementById('image');
+
+            if (window.isNoPhoto) {
+                // Aktif mode tanpa foto
+                btn.innerText = "PAKAI FOTO";
+                imgContainer.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                preview.classList.add('hidden');
+                
+                imgInput.required = false; // Matikan requirement
+                imgInput.value = ""; // Kosongkan file jika ada
+                document.getElementById('imagePreview').src = "";
+            } else {
+                // Kembali ke mode wajib foto
+                btn.innerText = "TIDAK ADA FOTO";
+                imgContainer.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                
+                imgInput.required = true; // Wajibkan kembali
+            }
+        };
+
+        // Star Rating Logic
+        let currentRating = 0; 
+        const stars = document.querySelectorAll('.star-icon');
+        function updateStars(ratingValue) {
+            stars.forEach(star => {
+                const val = parseInt(star.getAttribute('data-value'));
+                if (val <= ratingValue) {
+                    star.classList.remove('text-white/20');
+                    star.classList.add('text-yellow-400', 'drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]');
+                } else {
+                    star.classList.add('text-white/20');
+                    star.classList.remove('text-yellow-400', 'drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]');
+                }
+            });
         }
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', (e) => updateStars(parseInt(e.currentTarget.getAttribute('data-value'))));
+            star.addEventListener('mouseleave', () => updateStars(currentRating));
+            star.addEventListener('click', (e) => {
+                currentRating = parseInt(e.currentTarget.getAttribute('data-value'));
+                updateStars(currentRating);
+            });
+        });
+
+        // Dynamic Product & Prices
+        let productsData = {};
+        const productSelect = document.getElementById('productSelect');
+        const priceSelect = document.getElementById('priceSelect');
+        
+        onSnapshot(collection(db, 'products'), (snapshot) => {
+            productSelect.innerHTML = '<option value="" disabled selected>Select a Product...</option>';
+            productsData = {};
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                productsData[doc.id] = data; 
+                const name = data.name || data.title || data.productName || 'Unknown Product'; 
+                productSelect.innerHTML += `<option value="${doc.id}">${escapeHtml(name)}</option>`;
+            });
+        });
+
+        productSelect.addEventListener('change', (e) => {
+            const id = e.target.value;
+            priceSelect.innerHTML = '<option value="" disabled selected>Select Price Variant...</option>';
+            if (id && productsData[id] && Array.isArray(productsData[id].priceText) && productsData[id].priceText.length > 0) {
+                productsData[id].priceText.forEach(pStr => {
+                    priceSelect.innerHTML += `<option value="${escapeHtml(pStr)}">${escapeHtml(pStr)}</option>`;
+                });
+                priceSelect.disabled = false;
+            } else {
+                priceSelect.innerHTML = '<option value="" disabled selected>No variants available</option>';
+                priceSelect.disabled = true;
+            }
+        });
+
+        // Image Preview Handler
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('previewContainer');
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => { imagePreview.src = e.target.result; previewContainer.classList.remove('hidden'); }
+                reader.readAsDataURL(file);
+            }
+        });
+        document.getElementById('removeImageBtn').addEventListener('click', () => {
+            imageInput.value = "";
+            previewContainer.classList.add('hidden');
+            imagePreview.src = "";
+        });
+
+        // Form Submit to Cloudinary & Firestore
+        const form = document.getElementById('testimonialForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if(currentRating === 0) {
+                alert("Please select a star rating (1-5) before submitting.");
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const productId = productSelect.value;
+            const priceVariant = priceSelect.value;
+            const message = document.getElementById('message').value;
+            const file = imageInput.files[0];
+
+            // Validasi: Wajib ada file JIKA Mode 'Tanpa Foto' sedang TIDAK aktif
+            if(!productId || !priceVariant || (!file && !window.isNoPhoto)) {
+                alert("Please complete all required fields and upload an image (or choose 'TIDAK ADA FOTO').");
+                return;
+            }
+
+            const productName = productsData[productId].name || productsData[productId].title || 'Unknown';
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Uploading...';
+            submitBtn.disabled = true;
+
+            try {
+                let downloadUrl = "";
+
+                // 1. Upload ke Cloudinary HANYA jika file ada & isNoPhoto == false
+                if (!window.isNoPhoto && file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+                    const cloudinaryRes = await fetch(CLOUDINARY_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!cloudinaryRes.ok) throw new Error("Gagal mengupload gambar ke Cloudinary");
+                    const cloudinaryData = await cloudinaryRes.json();
+                    downloadUrl = cloudinaryData.secure_url;
+                }
+
+                // 2. Save Firebase
+                await addDoc(collection(db, 'testimonials'), {
+                    customerName: name,
+                    productId: productId,
+                    productName: productName,
+                    selectedPrice: priceVariant,
+                    rating: currentRating,
+                    message: message,
+                    imageUrl: downloadUrl,
+                    createdAt: serverTimestamp()
+                });
+
+                // Reset state Form
+                form.reset();
+                priceSelect.innerHTML = '<option value="" disabled selected>Select product first</option>';
+                priceSelect.disabled = true;
+                previewContainer.classList.add('hidden');
+                imagePreview.src = "";
+                currentRating = 0;
+                updateStars(0);
+
+                // Kembalikan tombol mode foto jika tadi dipakai
+                if (window.isNoPhoto) window.toggleNoPhoto(); 
+                
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 4000);
+                
+                // Auto switch back to Stories View
+                setTimeout(() => {
+                    setActiveTab(0);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 1000);
+
+            } catch (error) {
+                console.error("Error submitting testimonial: ", error);
+                alert("Failed to submit review. Please check your connection.");
+            } finally {
+                submitBtn.innerHTML = originalBtnHtml;
+                submitBtn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>
-
-
