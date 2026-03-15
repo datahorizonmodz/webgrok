@@ -33,6 +33,7 @@
             <a href="feedback.html" class="side-link ext">Feedback</a>
             <a href="about.html" class="side-link ext">About Me</a>
             <a href="testimoni.html" class="side-link ext">Testimoni</a>
+            <a href="caralogin.html" class="side-link ext">Cara Login</a>
         </nav>
     </aside>
 
@@ -47,6 +48,31 @@
                 <input type="password" id="admin-pass" class="input-field" placeholder="Password" autocomplete="off" required>
                 <button type="submit" class="btn-primary">MASUK</button>
             </form>
+        </div>
+    </div>
+
+    <!-- VERIFICATION MODAL -->
+    <div id="verify-modal" class="modal-layer">
+        <div class="modal-box verify-box">
+            <h2 class="modal-title" style="text-align:center; font-size: 1.25rem; margin-bottom: 12px; font-weight: 800;">VERIFIKASI DAHULU</h2>
+            <p style="text-align:center; color:var(--text-muted); font-size: 0.85rem; margin-bottom: 24px; line-height: 1.6; padding: 0 10px;">
+                Verifikasi ini akan menampilkan iklan terlebih dahulu, jika muncul iklan tunggu sekitar <strong>5 Detik</strong> lalu Back/Kembali ya.
+            </p>
+
+            <!-- Oval Trigger Box -->
+            <div id="verify-trigger" class="verify-trigger">
+                <div id="verify-circle" class="v-circle empty">
+                    <!-- Checkmark SVG (Hidden by default) -->
+                    <svg id="verify-check" class="v-check hidden" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <span id="verify-text" class="v-text">VERIFIKASI</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="verify-actions">
+                <button id="btn-verify-next" class="btn-primary v-btn-next disabled">BERIKUTNYA</button>
+                <button class="close-modal v-btn-cancel" data-close="verify-modal">BATAL</button>
+            </div>
         </div>
     </div>
 
@@ -204,3 +230,4 @@
     <script type="module" src="data.js"></script>
 </body>
 </html>
+
