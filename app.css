@@ -272,9 +272,16 @@ main { padding: 80px 16px 100px 16px; }
 .overlay {
     position: fixed; inset: 0; background: var(--overlay);
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s, background 0.3s, backdrop-filter 0.3s;
 }
 .overlay.active { opacity: 1; pointer-events: all; }
+
+/* Custom Dark Overlay for Verify Modal (No Blur, Pitch Black) */
+.overlay.dark-mode {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
 
 .modal-layer {
     position: fixed; inset: 0; z-index: 1000;
@@ -323,8 +330,105 @@ main { padding: 80px 16px 100px 16px; }
 .btn-primary {
     width: 100%; padding: 14px; border-radius: 12px; border: none;
     background: var(--accent); color: #fff; font-weight: 700; font-size: 1rem;
-    cursor: pointer; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    cursor: pointer; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: all 0.2s;
 }
+.btn-primary:active { transform: scale(0.98); }
+
+/* VERIFICATION MODAL STYLES */
+.verify-box {
+    max-width: 320px;
+    padding: 30px 24px;
+}
+.verify-trigger {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 0 auto 30px auto;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+    user-select: none;
+    width: fit-content;
+}
+.verify-trigger:active {
+    transform: scale(0.95);
+}
+.v-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+.v-circle.empty {
+    border: 3px solid var(--accent-light);
+    background: transparent;
+}
+.v-circle.loading {
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 1s linear infinite;
+}
+.v-circle.success {
+    background: var(--accent);
+    border: none;
+}
+.v-check {
+    width: 16px;
+    height: 16px;
+}
+.v-check.hidden { display: none; }
+
+.v-text {
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-main);
+    transition: color 0.3s ease;
+}
+
+.verify-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.v-btn-next {
+    transition: all 0.3s ease;
+}
+.v-btn-next.disabled {
+    background: var(--border);
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none; /* Disable native active scale */
+}
+.v-btn-cancel {
+    position: static;
+    width: 100%;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+.v-btn-cancel:hover { background: var(--bg); }
+
+/* Shake Animation for Disabled Next Button */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+.shake-anim { animation: shake 0.4s ease-in-out; }
 
 /* Product Modal specific */
 .product-header { text-align: center; margin-bottom: 16px; }
