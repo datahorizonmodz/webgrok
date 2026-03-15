@@ -1,7 +1,8 @@
 import { auth, db } from "./firebase.js";
 import { signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { enforceMinLoaderTime, activePageId, openModal, resetProductModalScroll } from "./app.js";
+// PENTING: Tambahkan fungsi openVerifyModal dari app.js
+import { enforceMinLoaderTime, activePageId, openModal, resetProductModalScroll, openVerifyModal } from "./app.js";
 
 // --- STATE ---
 let rawApps = [], rawStore = [], rawProfiles = [];
@@ -319,8 +320,14 @@ function createCardNode(item, type) {
     
     let sub = '';
     if(type === 'apps') {
-        el.href = item.targetLink || '#';
-        el.target = '_blank';
+        // PENTING: Matikan link asli, aktifkan popup modal
+        el.href = 'javascript:void(0)'; 
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Panggil fungsi modal pop-up
+            openVerifyModal(item.targetLink || '#');
+        });
+
         sub = item.updateDate ? (item.updateDate.toDate ? item.updateDate.toDate().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : item.updateDate) : '';
         const catDisp = Array.isArray(item.category) ? item.category.join(' - ') : (item.category || '');
         if(sub && catDisp) sub += ` - ${catDisp}`; else if (catDisp) sub = catDisp;
