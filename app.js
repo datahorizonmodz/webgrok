@@ -189,6 +189,12 @@ function switchPage(targetId) {
     checkActiveOverlays();
     
     updateNavIndicator();
+    
+    // Opsional: Update URL di browser tanpa reload halaman (agar tersinkronisasi)
+    if (window.location.hash !== '#' + targetId) {
+        window.history.replaceState(null, null, '#' + targetId);
+    }
+    
     window.dispatchEvent(new CustomEvent('pageChanged', { detail: targetId }));
 }
 
@@ -347,51 +353,39 @@ function updateOnboardingSpotlight(index) {
     const popup = document.getElementById('onboarding-popup');
     const arrow = document.getElementById('onboarding-arrow');
     
-    // Tempatkan Popup Center TEPAT dengan Center dari Main Dock
-    // Ini membantu saat di view Desktop, dock tidak di tengah absolute layar
     const dockCenter = dockRect.left + (dockRect.width / 2);
     popup.style.left = `${dockCenter}px`;
     
-    // Hitung kemana panah harus menunjuk.
-    // Menghitung selisih Center dari Tab Active dengan Center PopUp nya
     const tabCenter = rect.left + (rect.width / 2);
     let arrowOffset = tabCenter - dockCenter;
     
-    // Batasi seberapa jauh arrow bisa geser ke kanan / kiri agar tidak keluar bubble
     const maxOffset = 110;
     if (arrowOffset > maxOffset) arrowOffset = maxOffset;
     if (arrowOffset < -maxOffset) arrowOffset = -maxOffset;
     
     arrow.style.transform = `translateX(${arrowOffset}px)`;
     
-    // Kalkulasi jarak dari bawah (Window Height - posisi Atas Dock) 
-    // agar PopUp pas berada di atas Dock (Mobile maupun Desktop)
     const bottomOffset = window.innerHeight - dockRect.top + 18;
     popup.style.bottom = `${bottomOffset}px`;
 }
 
-// Bind Onboarding Button Logic
 const obBtn = document.getElementById('onboarding-btn');
 if(obBtn) {
     obBtn.addEventListener('click', () => {
         if (currentObStep < obSteps.length - 1) {
             currentObStep++;
             renderObStepText();
-            // Optional: Mengganti halaman aplikasi secara live sesuai step
             switchPage(tabs[currentObStep].dataset.target); 
         } else {
-            // DONE - Save expiry logic for 24 hours
             const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 Hours in ms
             localStorage.setItem('datzon_onboarding_done_until', expiryTime.toString());
             
-            // Clean close
             document.getElementById('onboarding-container').classList.remove('active');
             document.getElementById('onboarding-popup').classList.remove('visible');
         }
     });
 }
 
-// Adjust onboarding indicator on global resize
 window.addEventListener('resize', () => {
     if (!isDragging) updateNavIndicator();
     
@@ -419,6 +413,28 @@ export function resetProductModalScroll() {
         else pmIndicator.style.opacity = '0';
     }, 50);
 }
+
+// ==========================================
+// --- HASH ROUTING LOGIC (DEEP LINKING) ---
+// ==========================================
+function handleHashNavigation() {
+    // Ambil string di dalam URL setelah tanda "#" (contoh: "store")
+    const hash = window.location.hash.replace('#', '');
+    const validSections = ['apps', 'store', 'profiles'];
+    
+    // Jika hash tersebut valid/ada di dalam array seksi yang kita izinkan
+    if (validSections.includes(hash)) {
+        // Panggil fungsi switchPage untuk memanipulasi tampilan secara dinamis
+        switchPage(hash);
+    }
+}
+
+// 1. Eksekusi pengecekan Hash pada saat script pertama kali dimuat
+handleHashNavigation();
+
+// 2. Pasang pendengar kejadian (listener) jika hash URL berubah secara manual (misal: tombol 'Back' ditekan)
+window.addEventListener('hashchange', handleHashNavigation);
+
 
 // Init startup
 setTimeout(updateNavIndicator, 100);
