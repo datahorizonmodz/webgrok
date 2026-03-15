@@ -63,20 +63,38 @@ export function openModal(id) {
 export function closeModal(id) {
     const m = document.getElementById(id);
     if(m) m.classList.remove('active');
+    
+    // Khusus untuk reset saat Verify Modal ditutup
+    if(id === 'verify-modal') {
+        document.body.style.overflow = ''; // Unlock scroll
+        overlay.classList.remove('dark-mode'); // Hapus background hitam pekat
+    }
+    
     checkActiveOverlays();
 }
 
 function checkActiveOverlays() {
     const activeLayers = document.querySelectorAll('.modal-layer.active, .sidebar.active');
-    if (activeLayers.length === 0) overlay.classList.remove('active');
+    if (activeLayers.length === 0) {
+        overlay.classList.remove('active');
+        document.body.style.overflow = ''; // Guard clause unlock scroll
+    }
 }
 
-// Bind close buttons
+// Bind close buttons (untuk modal standar seperti admin, product, dan verifikasi)
 document.querySelectorAll('.close-modal').forEach(btn => {
     btn.addEventListener('click', () => closeModal(btn.dataset.close));
 });
 overlay.addEventListener('click', () => {
-    document.querySelectorAll('.modal-layer').forEach(m => m.classList.remove('active'));
+    // Prevent overlay click from closing the verification modal (force user to click BATAL)
+    const verifyModal = document.getElementById('verify-modal');
+    if (verifyModal && verifyModal.classList.contains('active')) {
+        return; 
+    }
+
+    document.querySelectorAll('.modal-layer').forEach(m => {
+        m.classList.remove('active');
+    });
     sidebar.classList.remove('active');
     checkActiveOverlays();
 });
@@ -265,6 +283,94 @@ window.addEventListener('mouseup', endDockDrag);
 dock.addEventListener('touchstart', startDockDrag, {passive: false});
 window.addEventListener('touchmove', moveDockDrag, {passive: false});
 window.addEventListener('touchend', endDockDrag);
+
+// ==========================================
+// --- VERIFICATION / AD MODAL LOGIC ---
+// ==========================================
+
+// Daftar link adsterra (Sekarang ada 3 link)
+const adLinks = [
+    "https://www.effectivegatecpm.com/z55w4h3qx2?key=b3e81a33d4a9ac5be6d499f5f1bd6274",
+    "https://www.effectivegatecpm.com/ei197f8i?key=7296ce5ce218473810261eabd049ad7d",
+    "https://www.effectivegatecpm.com/uyd5pi1y7g?key=ecda7388108e4bf6b485ab620343f53a"
+];
+let currentAdIndex = 0;
+let pendingDownloadUrl = "";
+let verifyState = "idle"; // 'idle' | 'loading' | 'success'
+
+const verifyTrigger = document.getElementById('verify-trigger');
+const verifyCircle = document.getElementById('verify-circle');
+const verifyCheck = document.getElementById('verify-check');
+const verifyText = document.getElementById('verify-text');
+const btnVerifyNext = document.getElementById('btn-verify-next');
+
+export function openVerifyModal(url) {
+    pendingDownloadUrl = url;
+    
+    // Reset state modal ke awal
+    verifyState = "idle";
+    
+    verifyCircle.className = "v-circle empty";
+    verifyCheck.classList.add('hidden');
+    verifyText.textContent = "VERIFIKASI";
+    verifyText.style.color = "var(--text-main)";
+    
+    btnVerifyNext.classList.add('disabled');
+    
+    // Tambahkan class khusus ke overlay untuk membuatnya hitam pekat dan lock body
+    overlay.classList.add('active', 'dark-mode');
+    document.body.style.overflow = 'hidden'; 
+    
+    const modal = document.getElementById('verify-modal');
+    modal.classList.add('active');
+}
+
+// Handler saat trigger oval diklik
+verifyTrigger.addEventListener('click', () => {
+    if (verifyState !== "idle") return; // Hanya merespon jika state idle
+    
+    // Pindah state ke loading
+    verifyState = "loading";
+    verifyCircle.className = "v-circle loading";
+    verifyText.textContent = "LOADING...";
+    
+    // Buka link iklan di tab baru secara bergantian
+    window.open(adLinks[currentAdIndex], '_blank');
+    
+    // Update index iklan untuk klik user selanjutnya
+    currentAdIndex = (currentAdIndex + 1) % adLinks.length;
+    
+    // Mulai hitung waktu 5 Detik
+    setTimeout(() => {
+        // Pindah state ke success
+        verifyState = "success";
+        verifyCircle.className = "v-circle success";
+        verifyCheck.classList.remove('hidden'); // Munculkan icon centang
+        
+        verifyText.textContent = "BERHASIL";
+        verifyText.style.color = "var(--accent)";
+        
+        // Aktifkan tombol BERIKUTNYA
+        btnVerifyNext.classList.remove('disabled');
+        
+    }, 5000);
+});
+
+// Handler untuk tombol BERIKUTNYA
+btnVerifyNext.addEventListener('click', () => {
+    if (btnVerifyNext.classList.contains('disabled')) {
+        // Tombol dikunci: Mainkan animasi bergetar
+        btnVerifyNext.classList.remove('shake-anim');
+        void btnVerifyNext.offsetWidth; // Trigger reflow
+        btnVerifyNext.classList.add('shake-anim');
+        return;
+    }
+    
+    // Jika tombol sudah di-enable (Verifikasi Berhasil)
+    window.open(pendingDownloadUrl, '_blank');
+    closeModal('verify-modal');
+});
+
 
 // --- ONBOARDING / GUIDED TOUR FEATURE ---
 let currentObStep = 0;
