@@ -142,7 +142,6 @@
 
         /* ----------------------------------------------------
            SISTEM VIEW ARCHITECTURE (CSS GRID STACK)
-           (Memastikan Konten 100% Rata Tengah tanpa bug lebar)
            ---------------------------------------------------- */
         .view-container {
             display: grid;
@@ -180,7 +179,7 @@
             z-index: 0; 
         }
 
-        /* Video Ratio 1080x2400 (Portrait Embed) */
+        /* Video Ratio 1080x2400 (Portrait Embed 9:16) */
         .video-container-limiter {
             width: 100%;
             max-width: 320px; 
@@ -314,7 +313,8 @@
                         </div>
                     </div>
 
-                    <div class="liquid-glass glass-list-item rounded-2xl p-3 flex items-center justify-between group enter-up delay-4" onclick="openVideo('wink_china')">
+                    <!-- Menu Wink China disembunyikan menggunakan class 'hidden' -->
+                    <div class="hidden liquid-glass glass-list-item rounded-2xl p-3 flex items-center justify-between group enter-up delay-4" onclick="openVideo('wink_china')">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-[1.2rem] overflow-hidden bg-white/10 border border-white/20 shadow-sm flex-shrink-0">
                                 <img src="https://res.cloudinary.com/dwctfnwdu/image/upload/v1771811170/ajye3tfxivfopze0kb8w.jpg" alt="Wink China" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
@@ -371,42 +371,42 @@
     <script>
         // Trigger Entrance Animation On Load
         document.addEventListener("DOMContentLoaded", () => {
-            // Memberikan sedikit delay 10ms agar DOM merender struktur grid terlebih dahulu sebelum memicu animasi up-scale
             setTimeout(() => {
                 document.body.classList.add("page-enter");
             }, 10);
         });
 
+        // LINK YOUTUBE SHORTS DIKONVERSI MENJADI EMBED AGAR BISA DIPUTAR
         const videoDatabase = {
             google: {
                 id: "video-google",
                 title: "Cara Login Google",
-                url: "https://jumpshare.com/embed/30Imzc9L1SUMtE4IxPEt" 
+                url: "https://www.youtube.com/embed/SdD3gm082Vs" 
             },
             wink: {
                 id: "video-wink",
                 title: "Cara Login Wink",
-                url: "https://jumpshare.com/embed/hC9QDjcDQYVtyrraovOp"
+                url: "https://www.youtube.com/embed/TQgjMp9u988"
             },
             winkit: {
                 id: "video-winkit",
                 title: "Cara Login Winkit",
-                url: "https://jumpshare.com/embed/MaD5p1axNi9Q7v6Pwfiy"
+                url: "https://www.youtube.com/embed/dc3P8aKXc7s"
             },
             meitu: {
                 id: "video-meitu",
                 title: "Cara Login Meitu",
-                url: "https://jumpshare.com/embed/bqYMoUOlinqBPFaTwDAz"
+                url: "https://www.youtube.com/embed/i8NDPGBeYgU"
             },
             wink_china: {
                 id: "video-wink-china",
                 title: "Cara Login Wink China",
-                url: "https://jumpshare.com/embed/qKCKbM5dEFNtUu9x63jn"
+                url: "" // Dikosongkan sementara karena di-hidden
             },
             x_design: {
                 id: "video-xdesign",
                 title: "Cara Login X-Design",
-                url: "https://jumpshare.com/embed/3PWAdAzpUkuaM6hZ1tof"
+                url: "https://www.youtube.com/embed/x5hs5lkYy34"
             }
         };
 
@@ -417,12 +417,20 @@
 
         function openVideo(appId) {
             const data = videoDatabase[appId];
-            if(!data) return;
+            if(!data || !data.url) return;
 
             videoTitle.textContent = data.title;
             
+            // Memasukkan Iframe YouTube Embed ke dalam Container
             videoWrapper.innerHTML = `
-                <iframe \n                    id="${data.id}" \n                    src="${data.url}" \n                    frameborder="0" \n                    webkitallowfullscreen \n                    mozallowfullscreen \n                    allowfullscreen>\n                </iframe>
+                <iframe 
+                    id="${data.id}" 
+                    src="${data.url}" 
+                    frameborder="0" 
+                    webkitallowfullscreen 
+                    mozallowfullscreen 
+                    allowfullscreen>
+                </iframe>
             `;
 
             // Animasi transisi geser antar grid view
