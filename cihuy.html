@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DATZON V6.1 - AM & Wink System</title>
+    <title>DATZON V6.2 - Ultimate Generator System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
@@ -13,16 +13,16 @@
         .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
         .locked { border-color: #ef4444 !important; color: #ef4444 !important; }
         .input-num::placeholder { color: #334155; opacity: 1; }
-        /* Scrollbar hidden for tabs */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec4899'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em; }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen p-4 flex flex-col items-center">
 
     <div class="w-full max-w-md space-y-6 mt-4 pb-20">
         <div class="text-center">
-            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V6.1</span></h1>
+            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V6.2</span></h1>
             <div id="connStatus" class="inline-flex items-center space-x-2 mt-2 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
                 <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menghubungkan...</span>
@@ -31,7 +31,7 @@
 
         <div class="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800 overflow-x-auto snap-x no-scrollbar gap-1">
             <button onclick="setTab('gen')" id="tGen" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold active-tab transition-all uppercase tracking-wider snap-center">AM Gen</button>
-            <button onclick="setTab('wink')" id="tWink" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Wink</button>
+            <button onclick="setTab('wink')" id="tWink" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Multi App</button>
             <button onclick="setTab('history')" id="tHistory" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Riwayat</button>
             <button onclick="setTab('admin')" id="tAdmin" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Sync</button>
         </div>
@@ -79,8 +79,32 @@
         <div id="viewWink" class="hidden space-y-6 animate-in fade-in duration-500">
             <div class="glass p-6 rounded-[2.5rem] shadow-2xl space-y-5">
                 <div class="text-center space-y-1 mb-4">
-                    <h2 class="text-xl font-black text-white uppercase tracking-wider italic text-pink-500">WINK PREMIUM</h2>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Input Instan Web Template</p>
+                    <h2 class="text-xl font-black text-white uppercase tracking-wider italic text-pink-500">MULTI APP PREMIUM</h2>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Generator Dinamis & Kalkulator Waktu</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase text-center tracking-widest">Aplikasi</label>
+                        <select id="appNameSelect" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 outline-none text-center font-bold text-pink-400 focus:border-pink-600 transition-all text-xs">
+                            <option value="Wink">Wink</option>
+                            <option value="Meitu">Meitu</option>
+                            <option value="Winkit">Winkit</option>
+                            <option value="X-Design">X-Design</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase text-center tracking-widest">Durasi</label>
+                        <select id="durationSelect" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 outline-none text-center font-bold text-pink-400 focus:border-pink-600 transition-all text-xs">
+                            <option value="3 Hari">3 Hari</option>
+                            <option value="7 Hari">7 Hari</option>
+                            <option value="9 Hari">9 Hari</option>
+                            <option value="14 Hari">14 Hari</option>
+                            <option value="15 Hari">15 Hari</option>
+                            <option value="30 Hari">30 Hari</option>
+                            <option value="1 Bulan">1 Bulan</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="pt-2 space-y-2">
@@ -88,21 +112,21 @@
                         Format: Email|Password
                     </label>
                     <input type="text" id="winkInput" placeholder="danzycoze@gmail.com|qweqweqwe" 
-                        class="w-full bg-slate-950 border border-slate-800 rounded-3xl p-5 outline-none text-center font-bold text-pink-400 focus:border-pink-600 transition-all input-num text-sm">
+                        class="w-full bg-slate-950 border border-slate-800 rounded-[2rem] p-5 outline-none text-center font-bold text-pink-400 focus:border-pink-600 transition-all input-num text-sm">
                 </div>
 
-                <div class="space-y-3 pt-4">
-                    <button onclick="generateWink()" 
+                <div class="space-y-3 pt-2">
+                    <button onclick="generateMultiApp()" 
                         class="w-full bg-gradient-to-r from-pink-600 to-rose-600 p-5 rounded-[1.5rem] font-bold text-white active:scale-95 transition-all shadow-xl shadow-pink-900/20 uppercase tracking-wider">
-                        Generate Data Wink
+                        Generate Template
                     </button>
                 </div>
             </div>
 
             <div id="resBoxWink" class="hidden glass p-6 rounded-[2.5rem] space-y-4 border-pink-500/20">
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-pink-500 uppercase">Hasil Generate Wink:</span>
-                    <button onclick="copyToClipboard('resTextWink', 'pink')" class="bg-pink-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-pink-500/30">SALIN WINK</button>
+                    <span class="text-[10px] font-bold text-pink-500 uppercase" id="resTitleMulti">Hasil Generate:</span>
+                    <button onclick="copyToClipboard('resTextWink', 'pink')" class="bg-pink-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-pink-500/30">SALIN TEKS</button>
                 </div>
                 <div id="resTextWink" class="text-[11px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/50 p-5 rounded-2xl border border-white/5 overflow-x-auto"></div>
             </div>
@@ -214,9 +238,12 @@
             document.getElementById('tAdmin').className = t === 'admin' ? btnAct : btnInact;
         };
 
-        // --- WINK GENERATOR LOGIC ---
-        window.generateWink = () => {
+        // --- MULTI APP GENERATOR LOGIC (WINK DLL) ---
+        window.generateMultiApp = () => {
+            const appName = document.getElementById('appNameSelect').value;
+            const duration = document.getElementById('durationSelect').value;
             const input = document.getElementById('winkInput').value.trim();
+
             if(!input) return notify("Input email|password dulu!", "red");
 
             const parts = input.split('|');
@@ -225,28 +252,52 @@
             const email = parts[0].trim();
             const password = parts[1].trim();
 
-            const tplWink = `WINK PREMIUM 1 BULAN RENEW
+            // Logika Renew: Muncul jika BUKAN 3 Hari atau 7 Hari
+            let isRenew = !['3 Hari', '7 Hari'].includes(duration);
+            let renewText = isRenew ? ' RENEW' : '';
+
+            // Logika Kalkulasi Tanggal (Format DD/MM/YY)
+            let expDate = new Date(); // Ambil tanggal hari ini otomatis
+            
+            if (duration === '1 Bulan') {
+                expDate.setMonth(expDate.getMonth() + 1);
+            } else {
+                let days = parseInt(duration.split(' ')[0]);
+                expDate.setDate(expDate.getDate() + days);
+            }
+
+            let dd = String(expDate.getDate()).padStart(2, '0');
+            let mm = String(expDate.getMonth() + 1).padStart(2, '0');
+            let yy = String(expDate.getFullYear()).slice(-2);
+            let formattedDate = `${dd}/${mm}/${yy}`;
+
+            const appNameLower = appName.toLowerCase();
+            const appNameUpper = appName.toUpperCase();
+
+            document.getElementById('resTitleMulti').innerText = `Hasil Generate ${appNameUpper}:`;
+
+            const tplWink = `${appNameUpper} PREMIUM ${duration.toUpperCase()}${renewText}
 
 𝗗𝗔𝗧𝗔 𝗔𝗞𝗨𝗡
 📧 Email : ${email}
 🔑 Password : ${password}
 
-- Pembelian 1 Bulan Full Garansi 
+- Pembelian ${duration} Full Garansi 
 
 🏷 Harap Ikuti Tutorial Login Terlebih Dahulu : 
 1. loginin ke google akun yang di atas
 2. jika belum tahu caranya bisa cek di link bawah
-3. hapus aplikasi wink jika sudah terinstall
+3. hapus aplikasi ${appNameLower} jika sudah terinstall
 4. buka play store dan gunakan akun yang di premium in ke play store nya
-5. kalau play storenya sudah pakai akun yang di premium in, download winknya
-6. buka wink dan login lewat google 
+5. kalau play storenya sudah pakai akun yang di premium in, download ${appNameLower}nya
+6. buka ${appNameLower} dan login lewat google 
 7. login menggunakan akun yang di atas
 8. jika sudah login klik langganan/perbarui sekarang terus klik pulihkan pembelian di pojok kanan bawah kecil tulisannya 
-9. jika sudah muncul tanggal seperti 11/02/26 artinya sudah premium
+9. jika sudah muncul tanggal seperti ${formattedDate} artinya sudah premium
 10. jika masih belum paham bisa cek tutorial lengkap nya di link ini
 11. https://datahorizonmodz.github.io/webgrok/caralogin.html
-12. setelah winknya sudah benar benar premium 
-13. harap batalkan premium winknya di play store
+12. setelah ${appNameLower}nya sudah benar benar premium 
+13. harap batalkan premium ${appNameLower}nya di play store
 14. caranya sudah ada di link atas
 15. jika ada kendala masalah atau problem chat admin yaa`;
 
@@ -507,7 +558,6 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        // Global Copy Function
         window.copyToClipboard = (elementId, colorTheme = 'blue') => {
             const text = document.getElementById(elementId).innerText;
             const el = document.createElement('textarea');
@@ -535,4 +585,3 @@
     </script>
 </body>
 </html>
-
