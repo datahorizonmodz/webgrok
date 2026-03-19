@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATZON AM Cloud - Admin & User</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050505; }
+        .glass { background: rgba(15, 15, 25, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .input-dark { background: #0f172a; border: 1px solid #1e293b; color: white; }
+        .input-dark:focus { border-color: #3b82f6; ring: 2px solid rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen p-4 flex flex-col items-center">
+
+    <div class="w-full max-w-md space-y-6 mt-6">
+        <!-- Brand -->
+        <div class="text-center">
+            <h1 class="text-4xl font-extrabold tracking-tighter text-white italic">DATZON<span class="text-blue-500 text-sm not-italic ml-1">CLOUD</span></h1>
+            <p class="text-slate-500 text-[10px] tracking-[0.3em] uppercase mt-1">Advanced Account Management</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex p-1 bg-slate-900/50 rounded-2xl border border-slate-800">
+            <button onclick="setTab('gen')" id="tGen" class="flex-1 py-3 rounded-xl text-xs font-bold transition-all active-tab">GENERATOR</button>
+            <button onclick="setTab('admin')" id="tAdmin" class="flex-1 py-3 rounded-xl text-xs font-bold transition-all text-slate-500">DATABASE UPLOAD</button>
+        </div>
+
+        <!-- VIEW: GENERATOR -->
+        <div id="viewGen" class="space-y-6 animate-in fade-in duration-500">
+            <div class="glass p-6 rounded-3xl shadow-2xl space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Input Nomor Akun</label>
+                    <input type="number" id="accNum" placeholder="Masukkan Angka..." 
+                        class="w-full input-dark rounded-2xl p-4 outline-none text-2xl font-bold transition-all">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="changeType('PRIVATE')" id="pBtn" class="p-3 rounded-xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400 transition-all">PRIVATE</button>
+                    <button onclick="changeType('SHARING')" id="sBtn" class="p-3 rounded-xl font-bold text-xs border-2 border-transparent bg-slate-800 text-slate-500 transition-all">SHARING</button>
+                </div>
+
+                <button onclick="fetchCloudData()" id="fetchBtn"
+                    class="w-full bg-blue-600 p-4 rounded-2xl font-bold text-white hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-900/20">
+                    GENERATE DARI CLOUD
+                </button>
+            </div>
+
+            <!-- Result -->
+            <div id="resBox" class="hidden glass p-6 rounded-3xl space-y-4 border-blue-500/20 bg-blue-500/5">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Siap Dikirim:</span>
+                    <button onclick="copyToClipboard()" class="bg-blue-600 text-[10px] px-4 py-1.5 rounded-full font-bold">SALIN TEKS</button>
+                </div>
+                <div id="resText" class="text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed"></div>
+            </div>
+        </div>
+
+        <!-- VIEW: ADMIN UPLOAD -->
+        <div id="viewAdmin" class="hidden space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <div class="glass p-6 rounded-3xl space-y-4">
+                <div class="p-3 bg-blue-600/10 border border-blue-600/20 rounded-xl">
+                    <h3 class="text-blue-400 text-xs font-bold mb-1">Tutorial Bulk Upload:</h3>
+                    <p class="text-[10px] text-slate-400 italic">
+                        1. Copy semua data di file DOC (88. email | link akses)<br>
+                        2. Paste di kotak bawah<br>
+                        3. Klik Upload. Data lama akan diperbarui otomatis.
+                    </p>
+                </div>
+
+                <textarea id="bulkText" rows="12" placeholder="88. email@mail.com | https://link..." 
+                    class="w-full input-dark rounded-xl p-4 text-[10px] font-mono outline-none resize-none"></textarea>
+
+                <button onclick="bulkUploadToFirebase()" id="uploadBtn"
+                    class="w-full bg-slate-100 text-slate-900 p-4 rounded-2xl font-bold hover:bg-white active:scale-95 transition-all">
+                    PROSES SEMUA DATA KE CLOUD
+                </button>
+                <div id="progress" class="text-[10px] text-center font-bold text-slate-500"></div>
+            </div>
+        </div>
+
+        <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full text-xs font-bold shadow-2xl hidden z-50"></div>
+        
+        <footer class="text-center text-slate-700 text-[10px] tracking-[0.4em] uppercase py-6">
+            Cloud Powered System
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+        // --- MASUKKAN CONFIG LU DI SINI ---
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDI4w8gIPE_kqGrKOSpcz84xUHDirwWqcw",
+  authDomain: "datzonweb.firebaseapp.com",
+  projectId: "datzonweb",
+  storageBucket: "datzonweb.firebasestorage.app",
+  messagingSenderId: "357601269435",
+  appId: "1:357601269435:web:fe993d66e4b7d6c9ba7b9e",
+  measurementId: "G-V4KQ5QJKVN"
+};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "am-generator-datzon"; 
+
+        let user = null;
+        let type = 'PRIVATE';
+
+        onAuthStateChanged(auth, (u) => {
+            if (!u) {
+                signInAnonymously(auth).catch(e => notify("Firebase Gagal Konek!", "red"));
+            } else {
+                user = u;
+                notify("Cloud Terhubung ✅");
+            }
+        });
+
+        window.setTab = (t) => {
+            document.getElementById('viewGen').classList.toggle('hidden', t !== 'gen');
+            document.getElementById('viewAdmin').classList.toggle('hidden', t !== 'admin');
+            document.getElementById('tGen').className = t === 'gen' ? 'flex-1 py-3 rounded-xl text-xs font-bold transition-all active-tab' : 'flex-1 py-3 rounded-xl text-xs font-bold transition-all text-slate-500';
+            document.getElementById('tAdmin').className = t === 'admin' ? 'flex-1 py-3 rounded-xl text-xs font-bold transition-all active-tab' : 'flex-1 py-3 rounded-xl text-xs font-bold transition-all text-slate-500';
+        };
+
+        window.changeType = (t) => {
+            type = t;
+            document.getElementById('pBtn').className = t === 'PRIVATE' ? 'p-3 rounded-xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400 transition-all' : 'p-3 rounded-xl font-bold text-xs border-2 border-transparent bg-slate-800 text-slate-500 transition-all';
+            document.getElementById('sBtn').className = t === 'SHARING' ? 'p-3 rounded-xl font-bold text-xs border-2 border-purple-600 bg-purple-600/10 text-purple-400 transition-all' : 'p-3 rounded-xl font-bold text-xs border-2 border-transparent bg-slate-800 text-slate-500 transition-all';
+        };
+
+        window.fetchCloudData = async () => {
+            const num = document.getElementById('accNum').value;
+            if(!num) return notify("Isi nomor akun dulu!");
+            
+            const btn = document.getElementById('fetchBtn');
+            btn.innerText = "SEDANG MENCARI...";
+            btn.disabled = true;
+
+            try {
+                // Rule 1 Path: artifacts/{appId}/public/data/{collection}/{docId}
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', num);
+                const snap = await getDoc(docRef);
+
+                if(snap.exists()) {
+                    renderTemplate(snap.data().email, snap.data().link);
+                } else {
+                    notify("Akun nomor " + num + " belum di-upload!");
+                }
+            } catch (e) {
+                notify("Database error!");
+            } finally {
+                btn.innerText = "GENERATE DARI CLOUD";
+                btn.disabled = false;
+            }
+        };
+
+        window.bulkUploadToFirebase = async () => {
+            const raw = document.getElementById('bulkText').value;
+            if(!raw) return notify("Kotak masih kosong!");
+            
+            const btn = document.getElementById('uploadBtn');
+            const prog = document.getElementById('progress');
+            const lines = raw.split('\n');
+            let count = 0;
+
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+
+            for(let line of lines) {
+                // Regex parsing: "Nomor. Email | Link"
+                const match = line.match(/(\d+)\.\s*([^| ]+)\s*\|\s*(\S+)/);
+                if(match) {
+                    const no = match[1];
+                    try {
+                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', no);
+                        await setDoc(ref, {
+                            email: match[2],
+                            link: match[3],
+                            updatedAt: new Date().toISOString()
+                        });
+                        count++;
+                        prog.innerText = `Mengupload data ke-${no}... (${count})`;
+                    } catch (e) { console.error(e); }
+                }
+            }
+
+            notify(`Berhasil upload ${count} akun!`);
+            btn.disabled = false;
+            btn.innerText = "PROSES SEMUA DATA KE CLOUD";
+            prog.innerText = "";
+        };
+
+        function renderTemplate(email, link) {
+            const tpl = `ALIGHT MOTION 1 TAHUN ${type}
+
+𝗗𝗔𝗧𝗔 𝗔𝗞𝗨𝗡
+📧 : ${email} | AKSES BUKA ${link}
+
+• Pembelian 1 tahun garansi selama 6 bulan.
+
+🏷 Harap Ikuti Tutorial login Terlebih Dahulu :
+1. buka aplikasi alight motion, pastikan sudah update versi terbaru Play Store.
+2. login menggunakan email biasa warna merah. jangan klik lewat google.
+3. tempel email yang dikasih oleh seller -> klik berikutnya.
+4. nah akan memerlukan link verifikasi loginnya ya
+5. verifikasinya klik link AKSES BUKA email di atas yang sudah disediakan (acc seller).
+6. scroll ke bawah sampai ada pesan "noreply@" warna biru/higau klik pesan paling atas scrol ke bawah lagi cari pesan "login to alight motion" atau "masuk ke alight motion" KLIK "Login ke Alight Creative". DONE PREMIUM ✅
+7. tutorial jika masih belum paham : https://vt.tiktok.com/ZSadM8pQh/`;
+
+            document.getElementById('resText').innerText = tpl;
+            document.getElementById('resBox').classList.remove('hidden');
+        }
+
+        window.copyToClipboard = () => {
+            const text = document.getElementById('resText').innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            notify("Teks Berhasil Disalin!");
+        };
+
+        function notify(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 2000);
+        }
+    </script>
+</body>
+</html>
+
