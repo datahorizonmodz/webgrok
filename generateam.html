@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DATZON Pro V5 - Tracking System</title>
+    <title>DATZON V6 - Auto Next & Security</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-        .active-tab { background: #3b82f6; color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
+        .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
         .locked { border-color: #ef4444 !important; color: #ef4444 !important; }
+        .input-num::placeholder { color: #334155; opacity: 1; }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen p-4 flex flex-col items-center">
@@ -19,7 +20,7 @@
     <div class="w-full max-w-md space-y-6 mt-6 pb-20">
         <!-- Brand Header -->
         <div class="text-center">
-            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V5</span></h1>
+            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V6</span></h1>
             <div id="connStatus" class="inline-flex items-center space-x-2 mt-2 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
                 <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menghubungkan...</span>
@@ -28,48 +29,57 @@
 
         <!-- Tab Switcher -->
         <div class="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800">
-            <button onclick="setTab('gen')" id="tGen" class="flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase">Generator</button>
-            <button onclick="setTab('history')" id="tHistory" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-widest">Riwayat</button>
-            <button onclick="setTab('admin')" id="tAdmin" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase">Sync</button>
+            <button onclick="setTab('gen')" id="tGen" class="flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider">Generator</button>
+            <button onclick="setTab('history')" id="tHistory" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider">Riwayat</button>
+            <button onclick="setTab('admin')" id="tAdmin" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider">Sync</button>
         </div>
 
         <!-- TAB: GENERATOR -->
         <div id="viewGen" class="space-y-6 animate-in fade-in duration-500">
-            <div class="glass p-6 rounded-[2.5rem] shadow-2xl space-y-6 relative overflow-hidden">
-                <div id="limitIndicator" class="hidden absolute top-0 left-0 w-full bg-red-600/20 text-red-500 text-[9px] font-bold py-1 text-center uppercase tracking-widest">Limit Akun Tercapai!</div>
+            <div class="glass p-6 rounded-[2.5rem] shadow-2xl space-y-5 relative overflow-hidden">
+                <div id="limitIndicator" class="hidden absolute top-0 left-0 w-full bg-red-600/20 text-red-500 text-[9px] font-bold py-1.5 text-center uppercase tracking-widest">Limit Akun Tercapai! Terkunci</div>
                 
                 <div class="pt-2">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-3 text-center tracking-widest">Input Nomor Akun</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-3 text-center tracking-widest flex items-center justify-center gap-2">
+                        <span>Nomor Akun</span>
+                        <span id="lastGenLabel" class="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded-md hidden">Terakhir: <span id="lastGenNumberText"></span></span>
+                    </label>
                     <input type="number" id="accNum" placeholder="---" 
-                        class="w-full bg-slate-950 border border-slate-800 rounded-3xl p-5 outline-none text-5xl text-center font-black text-blue-500 focus:border-blue-600 transition-all">
+                        class="w-full bg-slate-950 border border-slate-800 rounded-3xl p-5 outline-none text-5xl text-center font-black text-blue-500 focus:border-blue-600 transition-all input-num">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="changeType('PRIVATE')" id="pBtn" class="py-4 rounded-2xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400">PRIVATE</button>
-                    <button onclick="changeType('SHARING')" id="sBtn" class="py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500">SHARING</button>
+                    <button onclick="changeType('PRIVATE')" id="pBtn" class="py-4 rounded-2xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400 transition-all">PRIVATE</button>
+                    <button onclick="changeType('SHARING')" id="sBtn" class="py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500 transition-all">SHARING</button>
                 </div>
 
-                <button onclick="handleFetchClick()" id="fetchBtn"
-                    class="w-full btn-primary p-5 rounded-3xl font-bold text-white active:scale-95 transition-all shadow-xl shadow-blue-900/20 uppercase tracking-wider">
-                    Dapatkan Data
-                </button>
+                <div class="space-y-3 pt-2">
+                    <button onclick="handleFetchClick()" id="fetchBtn"
+                        class="w-full btn-primary p-5 rounded-[1.5rem] font-bold text-white active:scale-95 transition-all shadow-xl shadow-blue-900/20 uppercase tracking-wider">
+                        Dapatkan Data
+                    </button>
+                    <button onclick="generateNext()" id="nextBtn"
+                        class="hidden w-full bg-slate-800 border border-slate-700 p-4 rounded-[1.5rem] font-bold text-slate-300 hover:bg-slate-700 active:scale-95 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                        <span>Berikutnya</span>
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Preview Result -->
             <div id="resBox" class="hidden glass p-6 rounded-[2.5rem] space-y-4 border-blue-500/20">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-bold text-blue-500 uppercase">Hasil Generate:</span>
-                    <button onclick="copyToClipboard()" class="bg-blue-600 text-[10px] px-5 py-2 rounded-full font-bold">SALIN</button>
+                    <button onclick="copyToClipboard()" class="bg-blue-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-blue-500/30">SALIN</button>
                 </div>
                 <div id="resText" class="text-[11px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/50 p-5 rounded-2xl border border-white/5 overflow-x-auto"></div>
             </div>
         </div>
 
-        <!-- TAB: RIWAYAT (DROPDOWN LIST) -->
+        <!-- TAB: RIWAYAT -->
         <div id="viewHistory" class="hidden space-y-4 animate-in fade-in duration-300">
             <div class="space-y-3" id="historyContainer">
-                <!-- Dropdown item example -->
-                <div class="text-center py-10 text-slate-600 text-xs italic">Memuat riwayat penggunaan...</div>
+                <div class="text-center py-10 text-slate-600 text-xs italic">Memuat riwayat...</div>
             </div>
         </div>
 
@@ -80,29 +90,35 @@
                     class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-[10px] font-mono outline-none h-64 focus:border-blue-500 text-blue-200"></textarea>
 
                 <button onclick="bulkUploadBatch()" id="uploadBtn"
-                    class="w-full bg-white text-black p-5 rounded-3xl font-bold hover:bg-slate-200 transition-all uppercase">
+                    class="w-full bg-white text-black p-5 rounded-3xl font-bold hover:bg-slate-200 transition-all uppercase tracking-wider">
                     Sync Database Cloud
                 </button>
             </div>
         </div>
 
         <!-- MODAL: SECURITY OVERRIDE -->
-        <div id="securityModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6">
-            <div class="glass w-full max-w-sm p-8 rounded-[3rem] border-red-500/30 text-center space-y-6">
-                <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
+        <div id="securityModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6 animate-in zoom-in duration-200">
+            <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] border-red-500/30 text-center space-y-6">
+                <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto">
                     <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <div class="space-y-2">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-tighter">Security Override</h2>
-                    <p class="text-[10px] text-slate-500 uppercase tracking-widest">Masukkan password untuk generate ulang akun ini</p>
+                <div class="space-y-1">
+                    <h2 class="text-xl font-bold text-white uppercase tracking-tighter">Override Keamanan</h2>
+                    <p class="text-[9px] text-slate-400 uppercase tracking-widest">Pilih tipe baru & masukkan password</p>
                 </div>
                 
-                <input type="password" id="forcePass" placeholder="Masukkan Password" 
-                    class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 outline-none text-center font-bold focus:border-red-600 transition-all">
+                <!-- Type Selection for Force Generate -->
+                <div class="flex gap-2">
+                    <button onclick="setForceType('PRIVATE')" id="fPrivateBtn" class="flex-1 py-3 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500 font-bold text-[10px] transition-all uppercase">PRIVATE</button>
+                    <button onclick="setForceType('SHARING')" id="fSharingBtn" class="flex-1 py-3 rounded-xl bg-slate-900 text-slate-500 border border-transparent font-bold text-[10px] transition-all uppercase">SHARING</button>
+                </div>
+
+                <input type="password" id="forcePass" placeholder="Password: paksa" 
+                    class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 outline-none text-center font-bold focus:border-red-600 transition-all text-white">
                 
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="closeSecurityModal()" class="bg-slate-800 p-4 rounded-2xl text-[10px] font-bold uppercase">Batal</button>
-                    <button onclick="confirmForceGenerate()" class="bg-red-600 p-4 rounded-2xl text-[10px] font-bold uppercase text-white">Generate Paksa</button>
+                    <button onclick="closeSecurityModal()" class="bg-slate-800 p-4 rounded-2xl text-[10px] font-bold uppercase text-slate-300">Batal</button>
+                    <button onclick="confirmForceGenerate()" class="bg-red-600 p-4 rounded-2xl text-[10px] font-bold uppercase text-white shadow-lg shadow-red-600/20">Eksekusi</button>
                 </div>
             </div>
         </div>
@@ -110,7 +126,7 @@
         <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full text-xs font-bold shadow-2xl hidden z-50"></div>
         
         <footer class="text-center text-slate-700 text-[9px] tracking-[0.5em] uppercase py-8 font-bold">
-            Datzon Automation &copy; 2024
+            Datzon Ecosystem &copy; 2026
         </footer>
     </div>
 
@@ -137,8 +153,10 @@
 
         let user = null;
         let type = 'PRIVATE';
+        let forceType = 'PRIVATE';
         let forceClickCount = 0;
         let lastTargetId = '';
+        let lastGeneratedGlobalNumber = null; // Menyimpan No Akun Terakhir
 
         onAuthStateChanged(auth, (u) => {
             const status = document.getElementById('connStatus');
@@ -157,18 +175,33 @@
             tabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
             document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
             
-            document.getElementById('tGen').className = t === 'gen' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all';
-            document.getElementById('tHistory').className = t === 'history' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all';
-            document.getElementById('tAdmin').className = t === 'admin' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all';
+            document.getElementById('tGen').className = t === 'gen' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
+            document.getElementById('tHistory').className = t === 'history' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
+            document.getElementById('tAdmin').className = t === 'admin' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
         };
 
+        // Type UI Updater
         window.changeType = (t) => {
             type = t;
-            document.getElementById('pBtn').className = t === 'PRIVATE' ? 'py-4 rounded-2xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400' : 'py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500';
-            document.getElementById('sBtn').className = t === 'SHARING' ? 'py-4 rounded-2xl font-bold text-xs border-2 border-purple-600 bg-purple-600/10 text-purple-400' : 'py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500';
+            document.getElementById('pBtn').className = t === 'PRIVATE' ? 'py-4 rounded-2xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400 transition-all' : 'py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500 transition-all';
+            document.getElementById('sBtn').className = t === 'SHARING' ? 'py-4 rounded-2xl font-bold text-xs border-2 border-purple-600 bg-purple-600/10 text-purple-400 transition-all' : 'py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500 transition-all';
         };
 
-        // Logic Fetching & Locking
+        window.setForceType = (t) => {
+            forceType = t;
+            document.getElementById('fPrivateBtn').className = t === 'PRIVATE' ? 'flex-1 py-3 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500 font-bold text-[10px] transition-all uppercase' : 'flex-1 py-3 rounded-xl bg-slate-900 text-slate-500 border border-transparent font-bold text-[10px] transition-all uppercase';
+            document.getElementById('fSharingBtn').className = t === 'SHARING' ? 'flex-1 py-3 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500 font-bold text-[10px] transition-all uppercase' : 'flex-1 py-3 rounded-xl bg-slate-900 text-slate-500 border border-transparent font-bold text-[10px] transition-all uppercase';
+        };
+
+        // Generate Berikutnya (Otomatis +1)
+        window.generateNext = () => {
+            if(!lastGeneratedGlobalNumber) return notify("Belum ada riwayat terakhir!", "red");
+            const nextAcc = lastGeneratedGlobalNumber + 1;
+            document.getElementById('accNum').value = nextAcc;
+            handleFetchClick(); // Langsung proses
+        };
+
+        // Logic Fetching & Locking V6
         window.handleFetchClick = async () => {
             const num = document.getElementById('accNum').value;
             if(!num) return notify("Input nomor akun!", "red");
@@ -182,16 +215,19 @@
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', num);
             const snap = await getDoc(docRef);
 
-            if(!snap.exists()) return notify("Akun belum terdaftar!", "red");
+            if(!snap.exists()) return notify("Akun belum terdaftar di Cloud!", "red");
 
             const data = snap.data();
             const count = data.genCount || 0;
-            const currentAccType = type; // Type yang dipilih di UI
 
-            // Aturan Limit
+            // ATURAN LIMIT (Sangat Ketat)
             let isLimit = false;
-            if(currentAccType === 'PRIVATE' && count >= 1) isLimit = true;
-            if(currentAccType === 'SHARING' && count >= 3) isLimit = true;
+            if(count > 0) {
+                // 1. Jika sebelumnya PRIVATE -> Langsung Lock
+                if(data.lastType === 'PRIVATE') isLimit = true;
+                // 2. Jika sebelumnya SHARING -> Lock kalau udah 3x
+                else if(data.lastType === 'SHARING' && count >= 3) isLimit = true;
+            }
 
             if(isLimit) {
                 forceClickCount++;
@@ -201,35 +237,39 @@
                 if(forceClickCount >= 3) {
                     openSecurityModal();
                 } else {
-                    notify(`Limit Tercapai! (${3 - forceClickCount}x lagi untuk paksa)`, "red");
+                    notify(`Ter-Lock! Klik ${3 - forceClickCount}x lagi untuk Override`, "red");
                 }
                 return;
             }
 
-            // Jika Belum Limit, Langsung Generate
-            executeGenerate(num, data.email, data.link, count);
+            // Jika Aman, Langsung Generate dengan Type UI saat ini
+            executeGenerate(num, data.email, data.link, count, type);
         };
 
-        async function executeGenerate(num, email, link, currentCount) {
+        async function executeGenerate(num, email, link, currentCount, targetType) {
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', num);
             
             try {
                 await updateDoc(docRef, {
                     genCount: currentCount + 1,
-                    lastType: type,
+                    lastType: targetType,
                     lastGenerated: new Date().toISOString()
                 });
 
-                renderTemplate(email, link);
+                renderTemplate(email, link, targetType);
                 notify(`Berhasil Generate Akun #${num}`);
                 resetForceCounter();
             } catch (e) {
-                notify("Koneksi Database Error", "red");
+                notify("Database Terputus", "red");
             }
         }
 
         // Security Modal Handling
-        window.openSecurityModal = () => document.getElementById('securityModal').classList.remove('hidden');
+        window.openSecurityModal = () => {
+            document.getElementById('securityModal').classList.remove('hidden');
+            setForceType('PRIVATE'); // Default reset to Private
+            document.getElementById('forcePass').value = "";
+        };
         window.closeSecurityModal = () => {
             document.getElementById('securityModal').classList.add('hidden');
             resetForceCounter();
@@ -245,49 +285,63 @@
             const snap = await getDoc(docRef);
             const data = snap.data();
 
-            // Paksa generate: Reset count jadi 1 dan set type baru
+            // Eksekusi Paksa Generate -> Count direset jadi 1, Tipe berubah sesuai Modal
             await updateDoc(docRef, {
                 genCount: 1, 
-                lastType: type,
+                lastType: forceType,
                 lastGenerated: new Date().toISOString(),
                 forced: true
             });
 
-            renderTemplate(data.email, data.link);
+            // Sinkronisasi UI depan agar selaras dengan hasil paksa
+            changeType(forceType);
+            renderTemplate(data.email, data.link, forceType);
             closeSecurityModal();
-            notify("Generate Paksa Sukses!");
+            notify("Override Berhasil!", "blue");
         };
 
         function resetForceCounter() {
             forceClickCount = 0;
             document.getElementById('accNum').classList.remove('locked');
             document.getElementById('limitIndicator').classList.add('hidden');
-            document.getElementById('forcePass').value = "";
         }
 
-        // History System (Realtime Listener)
+        // History System & Auto Next Number Detection
         function listenToHistory() {
-            // Fetch all docs to filter in JS (as per Rule 2)
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'accounts'));
             
             onSnapshot(q, (snap) => {
                 const container = document.getElementById('historyContainer');
                 container.innerHTML = "";
                 
-                // Ambil yang pernah di generate (genCount > 0)
                 const items = [];
                 snap.forEach(doc => {
                     if(doc.data().genCount > 0) items.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Urutkan berdasarkan waktu generate terbaru
+                // Urutkan berdasarkan waktu paling baru
                 items.sort((a, b) => new Date(b.lastGenerated) - new Date(a.lastGenerated));
+
+                // Deteksi Akun Terakhir Generate
+                if(items.length > 0) {
+                    lastGeneratedGlobalNumber = parseInt(items[0].id);
+                    document.getElementById('accNum').placeholder = lastGeneratedGlobalNumber;
+                    
+                    // Update UI Labels
+                    document.getElementById('lastGenLabel').classList.remove('hidden');
+                    document.getElementById('lastGenNumberText').innerText = lastGeneratedGlobalNumber;
+                    
+                    const btnNext = document.getElementById('nextBtn');
+                    btnNext.classList.remove('hidden');
+                    btnNext.innerHTML = `<span>Berikutnya (Akun ${lastGeneratedGlobalNumber + 1})</span><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>`;
+                }
 
                 if(items.length === 0) {
                     container.innerHTML = `<div class="text-center py-20 text-slate-700 uppercase tracking-widest text-[10px]">Belum Ada Riwayat</div>`;
                     return;
                 }
 
+                // Render List Riwayat
                 items.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "glass p-4 rounded-2xl border-white/5";
@@ -306,14 +360,14 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-[8px] font-bold px-2 py-0.5 rounded-full ${isFull ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'} uppercase">${isFull ? 'Full' : 'Available'}</span>
+                                    <span class="text-[8px] font-bold px-2 py-0.5 rounded-full ${isFull ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'} uppercase">${isFull ? 'LOCKED' : 'AVAILABLE'}</span>
                                     <svg class="w-4 h-4 text-slate-600 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </summary>
                             <div class="mt-4 pt-4 border-t border-white/5 text-[10px] space-y-2">
                                 <div class="flex justify-between"><span class="text-slate-500">Email:</span> <span class="text-blue-300 font-mono">${item.email}</span></div>
-                                <div class="flex justify-between"><span class="text-slate-500">Status:</span> <span class="text-slate-300">${item.forced ? 'GENERATED PAKSA (RE-TYPE)' : 'Normal Usage'}</span></div>
-                                <button onclick="reCopy('${item.id}')" class="w-full mt-2 bg-slate-800 py-2 rounded-lg font-bold uppercase tracking-widest text-slate-400 active:bg-blue-600 active:text-white transition-colors">Salin Ulang Data</button>
+                                <div class="flex justify-between"><span class="text-slate-500">Keterangan:</span> <span class="text-slate-300">${item.forced ? 'Override Password' : 'Sistem Normal'}</span></div>
+                                <button onclick="reCopy('${item.id}')" class="w-full mt-2 bg-slate-800 py-3 rounded-xl font-bold uppercase tracking-widest text-slate-400 active:bg-blue-600 active:text-white transition-colors">Salin Ulang Teks</button>
                             </div>
                         </details>
                     `;
@@ -326,9 +380,9 @@
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', id);
             const snap = await getDoc(docRef);
             if(snap.exists()){
-                renderTemplate(snap.data().email, snap.data().link);
+                renderTemplate(snap.data().email, snap.data().link, snap.data().lastType);
                 copyToClipboard();
-                notify("Berhasil Salin Ulang!");
+                notify("Disalin Ulang!");
             }
         };
 
@@ -350,11 +404,10 @@
                 if(match) {
                     const no = match[1];
                     const ref = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', no);
-                    // Gunakan set merge agar tidak menghapus genCount jika sudah ada
                     batch.set(ref, {
                         email: match[2],
                         link: match[3],
-                        genCount: 0, // Default 0 jika baru
+                        genCount: 0,
                         lastType: 'PENDING'
                     }, { merge: true });
                     count++;
@@ -372,8 +425,8 @@
             }
         };
 
-        function renderTemplate(email, link) {
-            const tpl = `ALIGHT MOTION 1 TAHUN ${type}
+        function renderTemplate(email, link, renderType) {
+            const tpl = `ALIGHT MOTION 1 TAHUN ${renderType}
 
 𝗗𝗔𝗧𝗔 𝗔𝗞𝗨𝗡
 📧 : ${email} | AKSES BUKA ${link}
@@ -408,7 +461,7 @@
         function notify(msg, type = "blue") {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full text-xs font-bold shadow-2xl z-50 animate-bounce ${type === 'red' ? 'bg-red-600 text-white' : 'bg-white text-black'}`;
+            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full text-[11px] uppercase tracking-widest font-bold shadow-2xl z-50 animate-in slide-in-from-bottom-5 ${type === 'red' ? 'bg-red-600 text-white' : 'bg-white text-black'}`;
             t.classList.remove('hidden');
             setTimeout(() => t.classList.add('hidden'), 2500);
         }
