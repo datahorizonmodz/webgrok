@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DATZON V6 - Auto Next & Security</title>
+    <title>DATZON V6.1 - AM & Wink System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
@@ -13,35 +13,36 @@
         .active-tab { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
         .locked { border-color: #ef4444 !important; color: #ef4444 !important; }
         .input-num::placeholder { color: #334155; opacity: 1; }
+        /* Scrollbar hidden for tabs */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen p-4 flex flex-col items-center">
 
-    <div class="w-full max-w-md space-y-6 mt-6 pb-20">
-        <!-- Brand Header -->
+    <div class="w-full max-w-md space-y-6 mt-4 pb-20">
         <div class="text-center">
-            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V6</span></h1>
+            <h1 class="text-4xl font-black tracking-tighter text-white uppercase italic">Datzon<span class="text-blue-500 not-italic ml-1 text-sm">V6.1</span></h1>
             <div id="connStatus" class="inline-flex items-center space-x-2 mt-2 px-3 py-1 bg-slate-900 rounded-full border border-slate-800">
                 <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Menghubungkan...</span>
             </div>
         </div>
 
-        <!-- Tab Switcher -->
-        <div class="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800">
-            <button onclick="setTab('gen')" id="tGen" class="flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider">Generator</button>
-            <button onclick="setTab('history')" id="tHistory" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider">Riwayat</button>
-            <button onclick="setTab('admin')" id="tAdmin" class="flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider">Sync</button>
+        <div class="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800 overflow-x-auto snap-x no-scrollbar gap-1">
+            <button onclick="setTab('gen')" id="tGen" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold active-tab transition-all uppercase tracking-wider snap-center">AM Gen</button>
+            <button onclick="setTab('wink')" id="tWink" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Wink</button>
+            <button onclick="setTab('history')" id="tHistory" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Riwayat</button>
+            <button onclick="setTab('admin')" id="tAdmin" class="min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center">Sync</button>
         </div>
 
-        <!-- TAB: GENERATOR -->
         <div id="viewGen" class="space-y-6 animate-in fade-in duration-500">
             <div class="glass p-6 rounded-[2.5rem] shadow-2xl space-y-5 relative overflow-hidden">
                 <div id="limitIndicator" class="hidden absolute top-0 left-0 w-full bg-red-600/20 text-red-500 text-[9px] font-bold py-1.5 text-center uppercase tracking-widest">Limit Akun Tercapai! Terkunci</div>
                 
                 <div class="pt-2">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-3 text-center tracking-widest flex items-center justify-center gap-2">
-                        <span>Nomor Akun</span>
+                        <span>Nomor Akun AM</span>
                         <span id="lastGenLabel" class="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded-md hidden">Terakhir: <span id="lastGenNumberText"></span></span>
                     </label>
                     <input type="number" id="accNum" placeholder="---" 
@@ -56,7 +57,7 @@
                 <div class="space-y-3 pt-2">
                     <button onclick="handleFetchClick()" id="fetchBtn"
                         class="w-full btn-primary p-5 rounded-[1.5rem] font-bold text-white active:scale-95 transition-all shadow-xl shadow-blue-900/20 uppercase tracking-wider">
-                        Dapatkan Data
+                        Dapatkan Data AM
                     </button>
                     <button onclick="generateNext()" id="nextBtn"
                         class="hidden w-full bg-slate-800 border border-slate-700 p-4 rounded-[1.5rem] font-bold text-slate-300 hover:bg-slate-700 active:scale-95 transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2">
@@ -66,37 +67,68 @@
                 </div>
             </div>
 
-            <!-- Preview Result -->
             <div id="resBox" class="hidden glass p-6 rounded-[2.5rem] space-y-4 border-blue-500/20">
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-blue-500 uppercase">Hasil Generate:</span>
-                    <button onclick="copyToClipboard()" class="bg-blue-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-blue-500/30">SALIN</button>
+                    <span class="text-[10px] font-bold text-blue-500 uppercase">Hasil Generate AM:</span>
+                    <button onclick="copyToClipboard('resText')" class="bg-blue-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-blue-500/30">SALIN AM</button>
                 </div>
                 <div id="resText" class="text-[11px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/50 p-5 rounded-2xl border border-white/5 overflow-x-auto"></div>
             </div>
         </div>
 
-        <!-- TAB: RIWAYAT -->
+        <div id="viewWink" class="hidden space-y-6 animate-in fade-in duration-500">
+            <div class="glass p-6 rounded-[2.5rem] shadow-2xl space-y-5">
+                <div class="text-center space-y-1 mb-4">
+                    <h2 class="text-xl font-black text-white uppercase tracking-wider italic text-pink-500">WINK PREMIUM</h2>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest">Input Instan Web Template</p>
+                </div>
+                
+                <div class="pt-2 space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase text-center tracking-widest">
+                        Format: Email|Password
+                    </label>
+                    <input type="text" id="winkInput" placeholder="danzycoze@gmail.com|qweqweqwe" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-3xl p-5 outline-none text-center font-bold text-pink-400 focus:border-pink-600 transition-all input-num text-sm">
+                </div>
+
+                <div class="space-y-3 pt-4">
+                    <button onclick="generateWink()" 
+                        class="w-full bg-gradient-to-r from-pink-600 to-rose-600 p-5 rounded-[1.5rem] font-bold text-white active:scale-95 transition-all shadow-xl shadow-pink-900/20 uppercase tracking-wider">
+                        Generate Data Wink
+                    </button>
+                </div>
+            </div>
+
+            <div id="resBoxWink" class="hidden glass p-6 rounded-[2.5rem] space-y-4 border-pink-500/20">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-pink-500 uppercase">Hasil Generate Wink:</span>
+                    <button onclick="copyToClipboard('resTextWink', 'pink')" class="bg-pink-600 text-[10px] px-5 py-2 rounded-full font-bold shadow-lg shadow-pink-500/30">SALIN WINK</button>
+                </div>
+                <div id="resTextWink" class="text-[11px] font-mono text-slate-300 whitespace-pre-wrap leading-relaxed bg-black/50 p-5 rounded-2xl border border-white/5 overflow-x-auto"></div>
+            </div>
+        </div>
+
         <div id="viewHistory" class="hidden space-y-4 animate-in fade-in duration-300">
             <div class="space-y-3" id="historyContainer">
                 <div class="text-center py-10 text-slate-600 text-xs italic">Memuat riwayat...</div>
             </div>
         </div>
 
-        <!-- TAB: BULK UPLOAD -->
         <div id="viewAdmin" class="hidden space-y-6">
             <div class="glass p-6 rounded-[2.5rem] space-y-4">
-                <textarea id="bulkText" rows="12" placeholder="Paste data akun (88. email | link)..." 
+                <div class="text-center mb-2">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase">Sync Database AM</h3>
+                </div>
+                <textarea id="bulkText" rows="12" placeholder="Paste data akun AM (88. email | link)..." 
                     class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-[10px] font-mono outline-none h-64 focus:border-blue-500 text-blue-200"></textarea>
 
                 <button onclick="bulkUploadBatch()" id="uploadBtn"
                     class="w-full bg-white text-black p-5 rounded-3xl font-bold hover:bg-slate-200 transition-all uppercase tracking-wider">
-                    Sync Database Cloud
+                    Sync Ke Cloud
                 </button>
             </div>
         </div>
 
-        <!-- MODAL: SECURITY OVERRIDE -->
         <div id="securityModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6 animate-in zoom-in duration-200">
             <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] border-red-500/30 text-center space-y-6">
                 <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto">
@@ -107,7 +139,6 @@
                     <p class="text-[9px] text-slate-400 uppercase tracking-widest">Pilih tipe baru & masukkan password</p>
                 </div>
                 
-                <!-- Type Selection for Force Generate -->
                 <div class="flex gap-2">
                     <button onclick="setForceType('PRIVATE')" id="fPrivateBtn" class="flex-1 py-3 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500 font-bold text-[10px] transition-all uppercase">PRIVATE</button>
                     <button onclick="setForceType('SHARING')" id="fSharingBtn" class="flex-1 py-3 rounded-xl bg-slate-900 text-slate-500 border border-transparent font-bold text-[10px] transition-all uppercase">SHARING</button>
@@ -130,7 +161,6 @@
         </footer>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc, writeBatch, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -156,7 +186,7 @@
         let forceType = 'PRIVATE';
         let forceClickCount = 0;
         let lastTargetId = '';
-        let lastGeneratedGlobalNumber = null; // Menyimpan No Akun Terakhir
+        let lastGeneratedGlobalNumber = null; 
 
         onAuthStateChanged(auth, (u) => {
             const status = document.getElementById('connStatus');
@@ -171,16 +201,62 @@
 
         // Tab Handler
         window.setTab = (t) => {
-            const tabs = ['viewGen', 'viewAdmin', 'viewHistory'];
+            const tabs = ['viewGen', 'viewWink', 'viewAdmin', 'viewHistory'];
             tabs.forEach(tab => document.getElementById(tab).classList.add('hidden'));
             document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('hidden');
             
-            document.getElementById('tGen').className = t === 'gen' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
-            document.getElementById('tHistory').className = t === 'history' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
-            document.getElementById('tAdmin').className = t === 'admin' ? 'flex-1 py-3 rounded-xl text-[11px] font-bold active-tab transition-all uppercase tracking-wider' : 'flex-1 py-3 rounded-xl text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider';
+            const btnAct = 'min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold active-tab transition-all uppercase tracking-wider snap-center';
+            const btnInact = 'min-w-[80px] flex-1 py-3 rounded-xl text-[10px] sm:text-[11px] font-bold text-slate-500 transition-all uppercase tracking-wider snap-center';
+
+            document.getElementById('tGen').className = t === 'gen' ? btnAct : btnInact;
+            document.getElementById('tWink').className = t === 'wink' ? btnAct : btnInact;
+            document.getElementById('tHistory').className = t === 'history' ? btnAct : btnInact;
+            document.getElementById('tAdmin').className = t === 'admin' ? btnAct : btnInact;
         };
 
-        // Type UI Updater
+        // --- WINK GENERATOR LOGIC ---
+        window.generateWink = () => {
+            const input = document.getElementById('winkInput').value.trim();
+            if(!input) return notify("Input email|password dulu!", "red");
+
+            const parts = input.split('|');
+            if(parts.length !== 2) return notify("Format salah! Harus: email|password", "red");
+
+            const email = parts[0].trim();
+            const password = parts[1].trim();
+
+            const tplWink = `WINK PREMIUM 1 BULAN RENEW
+
+𝗗𝗔𝗧𝗔 𝗔𝗞𝗨𝗡
+📧 Email : ${email}
+🔑 Password : ${password}
+
+- Pembelian 1 Bulan Full Garansi 
+
+🏷 Harap Ikuti Tutorial Login Terlebih Dahulu : 
+1. loginin ke google akun yang di atas
+2. jika belum tahu caranya bisa cek di link bawah
+3. hapus aplikasi wink jika sudah terinstall
+4. buka play store dan gunakan akun yang di premium in ke play store nya
+5. kalau play storenya sudah pakai akun yang di premium in, download winknya
+6. buka wink dan login lewat google 
+7. login menggunakan akun yang di atas
+8. jika sudah login klik langganan/perbarui sekarang terus klik pulihkan pembelian di pojok kanan bawah kecil tulisannya 
+9. jika sudah muncul tanggal seperti 11/02/26 artinya sudah premium
+10. jika masih belum paham bisa cek tutorial lengkap nya di link ini
+11. https://datahorizonmodz.github.io/webgrok/caralogin.html
+12. setelah winknya sudah benar benar premium 
+13. harap batalkan premium winknya di play store
+14. caranya sudah ada di link atas
+15. jika ada kendala masalah atau problem chat admin yaa`;
+
+            document.getElementById('resTextWink').innerText = tplWink;
+            document.getElementById('resBoxWink').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        };
+
+
+        // --- ALIGHT MOTION LOGIC ---
         window.changeType = (t) => {
             type = t;
             document.getElementById('pBtn').className = t === 'PRIVATE' ? 'py-4 rounded-2xl font-bold text-xs border-2 border-blue-600 bg-blue-600/10 text-blue-400 transition-all' : 'py-4 rounded-2xl font-bold text-xs border-2 border-transparent bg-slate-900 text-slate-500 transition-all';
@@ -193,20 +269,17 @@
             document.getElementById('fSharingBtn').className = t === 'SHARING' ? 'flex-1 py-3 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500 font-bold text-[10px] transition-all uppercase' : 'flex-1 py-3 rounded-xl bg-slate-900 text-slate-500 border border-transparent font-bold text-[10px] transition-all uppercase';
         };
 
-        // Generate Berikutnya (Otomatis +1)
         window.generateNext = () => {
             if(!lastGeneratedGlobalNumber) return notify("Belum ada riwayat terakhir!", "red");
             const nextAcc = lastGeneratedGlobalNumber + 1;
             document.getElementById('accNum').value = nextAcc;
-            handleFetchClick(); // Langsung proses
+            handleFetchClick(); 
         };
 
-        // Logic Fetching & Locking V6
         window.handleFetchClick = async () => {
             const num = document.getElementById('accNum').value;
             if(!num) return notify("Input nomor akun!", "red");
 
-            // Reset counter jika ganti nomor
             if(lastTargetId !== num) {
                 forceClickCount = 0;
                 lastTargetId = num;
@@ -220,12 +293,9 @@
             const data = snap.data();
             const count = data.genCount || 0;
 
-            // ATURAN LIMIT (Sangat Ketat)
             let isLimit = false;
             if(count > 0) {
-                // 1. Jika sebelumnya PRIVATE -> Langsung Lock
                 if(data.lastType === 'PRIVATE') isLimit = true;
-                // 2. Jika sebelumnya SHARING -> Lock kalau udah 3x
                 else if(data.lastType === 'SHARING' && count >= 3) isLimit = true;
             }
 
@@ -242,7 +312,6 @@
                 return;
             }
 
-            // Jika Aman, Langsung Generate dengan Type UI saat ini
             executeGenerate(num, data.email, data.link, count, type);
         };
 
@@ -256,7 +325,7 @@
                     lastGenerated: new Date().toISOString()
                 });
 
-                renderTemplate(email, link, targetType);
+                renderTemplateAM(email, link, targetType);
                 notify(`Berhasil Generate Akun #${num}`);
                 resetForceCounter();
             } catch (e) {
@@ -264,10 +333,9 @@
             }
         }
 
-        // Security Modal Handling
         window.openSecurityModal = () => {
             document.getElementById('securityModal').classList.remove('hidden');
-            setForceType('PRIVATE'); // Default reset to Private
+            setForceType('PRIVATE'); 
             document.getElementById('forcePass').value = "";
         };
         window.closeSecurityModal = () => {
@@ -285,7 +353,6 @@
             const snap = await getDoc(docRef);
             const data = snap.data();
 
-            // Eksekusi Paksa Generate -> Count direset jadi 1, Tipe berubah sesuai Modal
             await updateDoc(docRef, {
                 genCount: 1, 
                 lastType: forceType,
@@ -293,9 +360,8 @@
                 forced: true
             });
 
-            // Sinkronisasi UI depan agar selaras dengan hasil paksa
             changeType(forceType);
-            renderTemplate(data.email, data.link, forceType);
+            renderTemplateAM(data.email, data.link, forceType);
             closeSecurityModal();
             notify("Override Berhasil!", "blue");
         };
@@ -306,7 +372,6 @@
             document.getElementById('limitIndicator').classList.add('hidden');
         }
 
-        // History System & Auto Next Number Detection
         function listenToHistory() {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'accounts'));
             
@@ -319,15 +384,12 @@
                     if(doc.data().genCount > 0) items.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Urutkan berdasarkan waktu paling baru
                 items.sort((a, b) => new Date(b.lastGenerated) - new Date(a.lastGenerated));
 
-                // Deteksi Akun Terakhir Generate
                 if(items.length > 0) {
                     lastGeneratedGlobalNumber = parseInt(items[0].id);
                     document.getElementById('accNum').placeholder = lastGeneratedGlobalNumber;
                     
-                    // Update UI Labels
                     document.getElementById('lastGenLabel').classList.remove('hidden');
                     document.getElementById('lastGenNumberText').innerText = lastGeneratedGlobalNumber;
                     
@@ -341,7 +403,6 @@
                     return;
                 }
 
-                // Render List Riwayat
                 items.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "glass p-4 rounded-2xl border-white/5";
@@ -380,13 +441,12 @@
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', id);
             const snap = await getDoc(docRef);
             if(snap.exists()){
-                renderTemplate(snap.data().email, snap.data().link, snap.data().lastType);
-                copyToClipboard();
+                renderTemplateAM(snap.data().email, snap.data().link, snap.data().lastType);
+                copyToClipboard('resText');
                 notify("Disalin Ulang!");
             }
         };
 
-        // Bulk Upload with Syncing genCount:0
         window.bulkUploadBatch = async () => {
             const raw = document.getElementById('bulkText').value;
             if(!raw) return notify("Input data kosong!", "red");
@@ -421,11 +481,11 @@
                 notify("Sync Gagal!", "red");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Sync Database Cloud";
+                btn.innerText = "Sync Ke Cloud";
             }
         };
 
-        function renderTemplate(email, link, renderType) {
+        function renderTemplateAM(email, link, renderType) {
             const tpl = `ALIGHT MOTION 1 TAHUN ${renderType}
 
 𝗗𝗔𝗧𝗔 𝗔𝗞𝗨𝗡
@@ -447,21 +507,28 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        window.copyToClipboard = () => {
-            const text = document.getElementById('resText').innerText;
+        // Global Copy Function
+        window.copyToClipboard = (elementId, colorTheme = 'blue') => {
+            const text = document.getElementById(elementId).innerText;
             const el = document.createElement('textarea');
             el.value = text;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            notify("Data Berhasil Disalin!");
+            notify("Data Berhasil Disalin!", colorTheme);
         };
 
         function notify(msg, type = "blue") {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full text-[11px] uppercase tracking-widest font-bold shadow-2xl z-50 animate-in slide-in-from-bottom-5 ${type === 'red' ? 'bg-red-600 text-white' : 'bg-white text-black'}`;
+            
+            let colorClass = 'bg-white text-black'; // default blue
+            if(type === 'red') colorClass = 'bg-red-600 text-white';
+            if(type === 'pink') colorClass = 'bg-pink-600 text-white';
+
+            t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-full text-[11px] uppercase tracking-widest font-bold shadow-2xl z-50 animate-in slide-in-from-bottom-5 ${colorClass}`;
+            
             t.classList.remove('hidden');
             setTimeout(() => t.classList.add('hidden'), 2500);
         }
