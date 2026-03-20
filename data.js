@@ -125,6 +125,10 @@ export function setPageFilter(text) {
 function getProcessedData(type) {
     let data = type === 'apps' ? rawApps : type === 'store' ? rawStore : rawProfiles;
     
+    // --- BUG FIX (KODE PENJAGAAN GANDA) ---
+    // Pastikan nge-filter mau dia tipe boolean false atau text "false"
+    data = data.filter(item => item.isActive !== false && item.isActive !== "false");
+    
     // Search Filter
     if(queryText) {
         data = data.filter(item => (item.name || item.title || '').toLowerCase().includes(queryText));
@@ -140,7 +144,7 @@ function getProcessedData(type) {
     
     // Sort profiles
     if(type === 'profiles') {
-        data = data.filter(s => s.isActive !== false).sort((a,b) => (a.order||0) - (b.order||0));
+        data = data.sort((a,b) => (a.order||0) - (b.order||0));
     }
     return data;
 }
