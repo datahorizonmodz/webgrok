@@ -2,10 +2,10 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <!-- PENTING: Disesuaikan agar mode Desktop merespon dengan benar -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DATZON Web App</title>
-    <link rel="stylesheet" href="app.css">
+    <!-- TAMBAHAN ?v=2 DISINI UNTUK CLEAR CACHE CSS -->
+    <link rel="stylesheet" href="app.css?v=2">
 </head>
 <body>
 
@@ -137,7 +137,6 @@
             </div>
         </header>
 
-
         <!-- MAIN PAGES -->
         <main id="main-content">
             <!-- PAGE: APPS -->
@@ -225,9 +224,9 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module" src="app.js"></script>
-    <script type="module" src="data.js"></script>
+    <!-- Scripts (DITAMBAHKAN CACHE BUSTER ?v=2 DISINI) -->
+    <script type="module" src="app.js?v=2"></script>
+    <script type="module" src="data.js?v=2"></script>
 </body>
 </html>
 
